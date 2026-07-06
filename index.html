@@ -51,16 +51,13 @@
             </div>
         </div>
 
-        <!-- 👑 輔助沙盒工具列 (新增存檔、讀檔、跳關功能) -->
+        <!-- 👑 輔助沙盒工具列 (移除跳關按鈕) -->
         <div class="flex gap-2 justify-between w-full px-3 py-2 bg-slate-900 border-x border-b border-slate-700 text-xs">
             <button id="btn-save" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-bookmark"></i> 存檔 (K)
+                <i class="fa-solid fa-bookmark"></i> 隨地存檔 (K)
             </button>
             <button id="btn-load" class="flex-1 py-1.5 bg-slate-700 text-slate-400 rounded text-center font-bold transition-all cursor-not-allowed flex items-center justify-center gap-1" disabled>
-                <i class="fa-solid fa-clock-rotate-left"></i> 讀檔 (L)
-            </button>
-            <button id="btn-skip" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-angles-up"></i> 跳關 (N)
+                <i class="fa-solid fa-clock-rotate-left"></i> 快速讀檔 (L)
             </button>
         </div>
 
@@ -131,7 +128,7 @@
         <p class="hidden md:block"><span class="text-slate-300 font-semibold">電腦操作：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">A</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">D</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">←</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">→</kbd> 移動。</p>
         <p class="hidden md:block">按住 <kbd class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700">空白鍵 (Space)</kbd> 進行蓄力，釋放時會依方向跳出。</p>
         <p class="hidden md:block"><span class="text-rose-400 font-semibold">急停煞車：</span> 按住 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">S</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">↓ 下方向鍵</kbd> 可以在滑行時緊急減速！</p>
-        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔助熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">N</kbd> 快速跳關。</p>
+        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔助熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔。</p>
         <p class="md:hidden"><span class="text-slate-300 font-semibold">手機操作：</span> 使用方向鍵移動、<span class="text-rose-400 font-semibold">下/煞車</span> 進行急停、<span class="text-emerald-400 font-semibold">CHARGE</span> 進行蓄力跳躍。</p>
     </footer>
 
@@ -199,7 +196,6 @@
                     noteOsc.stop(now + idx * 0.1 + 0.25);
                 });
             } else if (type === 'save') {
-                // 存檔提示音效
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(440, now);
                 osc.frequency.setValueAtTime(880, now + 0.05);
@@ -208,7 +204,6 @@
                 osc.start(now);
                 osc.stop(now + 0.15);
             } else if (type === 'load') {
-                // 讀檔提示音效
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, now);
                 osc.frequency.setValueAtTime(440, now + 0.05);
@@ -291,7 +286,7 @@
         const screens = [
             // 關卡 1 (最底層)：教學與基礎跳躍
             [
-                { x: 0, y: 590, w: 480, h: 50, color: '#334155' }, // 地板
+                { x: 0, y: 590, w: 480, h: 50, color: '#334155' }, 
                 { x: 40, y: 470, w: 130, h: 30, color: '#475569' },
                 { x: 310, y: 470, w: 130, h: 30, color: '#475569' },
                 { x: 180, y: 350, w: 120, h: 30, color: '#475569' },
@@ -331,14 +326,19 @@
             ],
             // 關卡 4 (頂層)：極限風暴
             [
-                { x: 0, y: 610, w: 120, h: 30, color: '#1e293b' },
-                { x: 360, y: 610, w: 120, h: 30, color: '#1e293b' },
-                { x: 90, y: 500, w: 110, h: 30, color: '#1e293b' },
-                { x: 280, y: 500, w: 110, h: 30, color: '#38bdf8', isIce: true }, 
-                { x: 20, y: 380, w: 80, h: 30, color: '#1e293b' },
-                { x: 380, y: 380, w: 80, h: 30, color: '#1e293b' },
-                { x: 180, y: 270, w: 120, h: 30, color: '#1e293b' },
-                { x: 130, y: 150, w: 220, h: 30, color: '#b45309' }, 
+                { x: 0, y: 610, w: 120, h: 30, color: '#1e293b' },                     
+                { x: 360, y: 610, w: 120, h: 30, color: '#1e293b' },                   
+                { x: 80, y: 510, w: 110, h: 30, color: '#1e293b' },                    
+                { x: 290, y: 510, w: 110, h: 30, color: '#38bdf8', isIce: true },      
+                { x: 20, y: 410, w: 100, h: 30, color: '#1e293b' },                    
+                { x: 360, y: 410, w: 100, h: 30, color: '#1e293b' },                   
+                
+                // 核心引路台階 (徹底分開，X 軸完全無重疊，防頂頭)
+                { x: 140, y: 320, w: 100, h: 30, color: '#1e293b' },                   
+                { x: 260, y: 230, w: 100, h: 30, color: '#1e293b' },                   
+                
+                // 終點：改短偏左的終點大平台
+                { x: 100, y: 140, w: 140, h: 30, color: '#b45309' }, 
             ]
         ];
 
@@ -346,8 +346,8 @@
 
         // 寶藏
         const treasure = {
-            x: 220,
-            y: 110,
+            x: 150,
+            y: 100,
             w: 40,
             h: 40,
             isCollected: false
@@ -368,7 +368,7 @@
             }
         }
 
-        // 冰雪花碎粒子 (騎士在冰上滑行或煞車時噴濺)
+        // 冰雪花碎粒子 
         const iceParticles = [];
         function createIceSplash(x, y, isBraking = false) {
             const count = isBraking ? 4 : 2; 
@@ -416,7 +416,6 @@
                 currentScreenIndex: currentScreenIndex
             };
             
-            // 啟用讀檔按鈕
             const btnLoad = document.getElementById('btn-load');
             btnLoad.removeAttribute('disabled');
             btnLoad.className = "flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1";
@@ -445,36 +444,10 @@
             showToast("⏳ 已載入存檔點位置！");
         }
 
-        // 3. 快速跳關 (N)
-        function skipLevel() {
-            if (isGameFinished) return;
-            
-            // 樓層循環 (1 -> 2 -> 3 -> 4 -> 1)
-            currentScreenIndex = (currentScreenIndex + 1) % screens.length;
-            
-            // 安全落腳在該樓層的第一個平台中央
-            const targetPlat = screens[currentScreenIndex][0];
-            player.x = targetPlat.x + (targetPlat.w / 2) - (player.w / 2);
-            player.y = targetPlat.y - player.h - 5;
-            player.vx = 0;
-            player.vy = 0;
-            player.isGrounded = true;
-            player.onIce = targetPlat.isIce || false;
-            player.isCharging = false;
-            player.chargeAmount = 0;
-
-            updateUIFloor();
-            playSound('land');
-            showToast(`🚀 已跳越至第 ${currentScreenIndex + 1} 樓！`);
-        }
-
-        // 點擊事件綁定
         document.getElementById('btn-save').addEventListener('click', quickSave);
         document.getElementById('btn-load').addEventListener('click', quickLoad);
-        document.getElementById('btn-skip').addEventListener('click', skipLevel);
 
-
-        // --- 鍵盤監聽事件 (擴充快速鍵 K, L, N) ---
+        // --- 鍵盤監聽事件 (移除跳關快捷鍵 N) ---
         window.addEventListener('keydown', (e) => {
             if (isGameFinished) return;
             if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
@@ -488,10 +461,8 @@
                 keys.space = true;
             }
             
-            // 沙盒快速鍵
-            if (e.code === 'KeyK') quickSave();   // K 鍵存檔
-            if (e.code === 'KeyL') quickLoad();   // L 鍵讀檔
-            if (e.code === 'KeyN') skipLevel();   // N 鍵跳關
+            if (e.code === 'KeyK') quickSave();   
+            if (e.code === 'KeyL') quickLoad();   
         });
 
         window.addEventListener('keyup', (e) => {
