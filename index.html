@@ -51,13 +51,16 @@
             </div>
         </div>
 
-        <!-- 👑 輔助沙盒工具列 (移除跳關按鈕) -->
+        <!-- 👑 輔助沙盒工具列 -->
         <div class="flex gap-2 justify-between w-full px-3 py-2 bg-slate-900 border-x border-b border-slate-700 text-xs">
             <button id="btn-save" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-bookmark"></i> 隨地存檔 (K)
+                <i class="fa-solid fa-bookmark"></i> 存檔 (K)
             </button>
             <button id="btn-load" class="flex-1 py-1.5 bg-slate-700 text-slate-400 rounded text-center font-bold transition-all cursor-not-allowed flex items-center justify-center gap-1" disabled>
-                <i class="fa-solid fa-clock-rotate-left"></i> 快速讀檔 (L)
+                <i class="fa-solid fa-clock-rotate-left"></i> 讀檔 (L)
+            </button>
+            <button id="btn-skip" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
+                <i class="fa-solid fa-angles-up"></i> 跳關 (N)
             </button>
         </div>
 
@@ -128,7 +131,7 @@
         <p class="hidden md:block"><span class="text-slate-300 font-semibold">電腦操作：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">A</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">D</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">←</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">→</kbd> 移動。</p>
         <p class="hidden md:block">按住 <kbd class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700">空白鍵 (Space)</kbd> 進行蓄力，釋放時會依方向跳出。</p>
         <p class="hidden md:block"><span class="text-rose-400 font-semibold">急停煞車：</span> 按住 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">S</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">↓ 下方向鍵</kbd> 可以在滑行時緊急減速！</p>
-        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔助熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔。</p>
+        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔助熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">N</kbd> 快速跳關。</p>
         <p class="md:hidden"><span class="text-slate-300 font-semibold">手機操作：</span> 使用方向鍵移動、<span class="text-rose-400 font-semibold">下/煞車</span> 進行急停、<span class="text-emerald-400 font-semibold">CHARGE</span> 進行蓄力跳躍。</p>
     </footer>
 
@@ -221,6 +224,8 @@
             speed: 3,                  // 左右走路移動速度
             iceFriction: 0.91,         // 冰面滑動摩擦阻力
             iceAcceleration: 0.20,     // 冰面行走加速度
+            windForceAir: -0.12,       // 【新增】第三關空中的風阻推力（往左吹）
+            windForceGround: -0.35,    // 【新增】第三關地面的緩慢滑行推力（往左吹）
             
             // 跳躍高度與蓄力調整
             minJumpY: 5.2,             // 基礎最小垂直跳躍力
@@ -282,7 +287,7 @@
         let mobileDown = false;
         let mobileCharging = false;
 
-        // 關卡配置
+        // 關卡配置 - 所有平台高度為 30px
         const screens = [
             // 關卡 1 (最底層)：教學與基礎跳躍
             [
@@ -312,7 +317,7 @@
                 // 4. 頂端出口安全大平台
                 { x: 140, y: 120, w: 200, h: 30, color: '#4d4d4d' }, 
             ],
-            // 關卡 3：撞頭（Bonk）地獄
+            // 關卡 3：撞頭（Bonk）地獄 + 【新增強風機制 🌬️】
             [
                 { x: 150, y: 610, w: 180, h: 30, color: '#3b82f6' },
                 { x: 0, y: 490, w: 190, h: 35, color: '#4b5563' },  
@@ -324,7 +329,7 @@
                 { x: 0, y: 70, w: 110, h: 30, color: '#4b5563' },
                 { x: 370, y: 70, w: 110, h: 30, color: '#4b5563' },
             ],
-            // 關卡 4 (頂層)：極限風暴
+            // 關卡 4 (頂層)：極限風暴 
             [
                 { x: 0, y: 610, w: 120, h: 30, color: '#1e293b' },                     
                 { x: 360, y: 610, w: 120, h: 30, color: '#1e293b' },                   
@@ -333,7 +338,7 @@
                 { x: 20, y: 410, w: 100, h: 30, color: '#1e293b' },                    
                 { x: 360, y: 410, w: 100, h: 30, color: '#1e293b' },                   
                 
-                // 核心引路台階 (徹底分開，X 軸完全無重疊，防頂頭)
+                // 核心引路台階 (防頂頭)
                 { x: 140, y: 320, w: 100, h: 30, color: '#1e293b' },                   
                 { x: 260, y: 230, w: 100, h: 30, color: '#1e293b' },                   
                 
@@ -356,14 +361,17 @@
         // 背景粒子效果
         const particles = [];
         function createParticles() {
-            if (particles.length < 30) {
+            if (particles.length < 40) {
+                // 如果是第三關，增加強風粒子的比重
+                const isWindLevel = currentScreenIndex === 2;
                 particles.push({
-                    x: Math.random() * canvas.width,
+                    x: isWindLevel ? canvas.width + 10 : Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: -Math.random() * 0.5 - 0.1,
-                    size: Math.random() * 2 + 1,
-                    alpha: Math.random() * 0.5 + 0.2
+                    vx: isWindLevel ? -3.5 - Math.random() * 2 : (Math.random() - 0.5) * 0.3, // 橫向高速流動
+                    vy: isWindLevel ? (Math.random() - 0.5) * 0.2 : -Math.random() * 0.5 - 0.1,
+                    size: isWindLevel ? Math.random() * 4 + 1 : Math.random() * 2 + 1, // 風粒子的線條感
+                    alpha: Math.random() * 0.6 + 0.2,
+                    isWindLine: isWindLevel
                 });
             }
         }
@@ -401,8 +409,6 @@
         }
 
         // --- 沙盒與作弊功能實作 ---
-        
-        // 1. 隨地存檔 (K)
         function quickSave() {
             if (isGameFinished) return;
             savedState = {
@@ -424,7 +430,6 @@
             showToast("💾 當前位置已儲存！");
         }
 
-        // 2. 快速讀檔 (L)
         function quickLoad() {
             if (isGameFinished || !savedState) return;
             
@@ -444,10 +449,31 @@
             showToast("⏳ 已載入存檔點位置！");
         }
 
+        function skipLevel() {
+            if (isGameFinished) return;
+            
+            currentScreenIndex = (currentScreenIndex + 1) % screens.length;
+            
+            const targetPlat = screens[currentScreenIndex][0];
+            player.x = targetPlat.x + (targetPlat.w / 2) - (player.w / 2);
+            player.y = targetPlat.y - player.h - 5;
+            player.vx = 0;
+            player.vy = 0;
+            player.isGrounded = true;
+            player.onIce = targetPlat.isIce || false;
+            player.isCharging = false;
+            player.chargeAmount = 0;
+
+            updateUIFloor();
+            playSound('land');
+            showToast(`🚀 已跳越至第 ${currentScreenIndex + 1} 樓！`);
+        }
+
         document.getElementById('btn-save').addEventListener('click', quickSave);
         document.getElementById('btn-load').addEventListener('click', quickLoad);
+        document.getElementById('btn-skip').addEventListener('click', skipLevel);
 
-        // --- 鍵盤監聽事件 (移除跳關快捷鍵 N) ---
+        // --- 鍵盤監聽事件 ---
         window.addEventListener('keydown', (e) => {
             if (isGameFinished) return;
             if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
@@ -463,6 +489,7 @@
             
             if (e.code === 'KeyK') quickSave();   
             if (e.code === 'KeyL') quickLoad();   
+            if (e.code === 'KeyN') skipLevel();   
         });
 
         window.addEventListener('keyup', (e) => {
@@ -589,7 +616,7 @@
                 }
             }
 
-            // 3. 空中重力與硬直時間
+            // 3. 空中重力與硬直時間 + 【強風物理推力套用】
             if (!player.isGrounded) {
                 player.gravity = (player.vy < 0) ? PHYSICS.gravityUp : PHYSICS.gravityDown;
                 player.vy += player.gravity;
@@ -599,6 +626,17 @@
                     if (player.bounceTimer <= 0) {
                         player.isBouncing = false;
                     }
+                }
+            }
+
+            // 【新增】第三關強風水平推力修正
+            if (currentScreenIndex === 2) {
+                if (!player.isGrounded) {
+                    // 空中強風向左吹拂
+                    player.vx += PHYSICS.windForceAir;
+                } else if (!isBraking) {
+                    // 地面時如果沒按煞車，強風會推著你慢慢往左滑動
+                    player.vx += PHYSICS.windForceGround;
                 }
             }
 
@@ -762,8 +800,8 @@
                 bgGradient.addColorStop(0, '#0c4a6e'); 
                 bgGradient.addColorStop(1, '#023e8a');
             } else if (currentScreenIndex === 2) {
-                bgGradient.addColorStop(0, '#020617'); 
-                bgGradient.addColorStop(1, '#0f172a');
+                bgGradient.addColorStop(0, '#0f172a'); // 關卡3：強風暗綠/灰綠色調
+                bgGradient.addColorStop(1, '#115e59');
             } else {
                 bgGradient.addColorStop(0, '#075985'); 
                 bgGradient.addColorStop(1, '#0c4a6e');
@@ -771,22 +809,37 @@
             ctx.fillStyle = bgGradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 繪製背景風雪粒子
+            // 繪製背景粒子（第三關會呈現流線型風沙）
             createParticles();
             particles.forEach((p, idx) => {
                 p.x += p.vx;
                 p.y += p.vy;
-                if (p.y < 0) {
-                    particles.splice(idx, 1);
-                } else {
-                    ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
+                
+                // 第三關的風粒子如果移出螢幕就從右側重置
+                if (p.isWindLine) {
+                    if (p.x < -20) {
+                        p.x = canvas.width + 10;
+                        p.y = Math.random() * canvas.height;
+                    }
+                    ctx.strokeStyle = `rgba(165, 243, 252, ${p.alpha})`; // 青色亮風流
+                    ctx.lineWidth = p.size;
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x + 15 + Math.random() * 15, p.y); // 拉長線條感
+                    ctx.stroke();
+                } else {
+                    if (p.y < 0) {
+                        particles.splice(idx, 1);
+                    } else {
+                        ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 }
             });
 
-            // 繪製滑冰屑特效粒子
+            // 繪製滑冰屑/風吹塵埃粒子
             iceParticles.forEach(p => {
                 ctx.fillStyle = `rgba(186, 230, 253, ${p.life / 40})`;
                 ctx.fillRect(p.x, p.y, p.size, p.size);
@@ -834,6 +887,30 @@
             }
 
             drawPlayer();
+
+            // 【新增】第三關強風動態 UI 警示燈
+            if (currentScreenIndex === 2) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+                ctx.strokeStyle = 'rgba(34, 211, 238, 0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.roundRect(15, 15, 140, 30, 8);
+                ctx.fill();
+                ctx.stroke();
+
+                // 閃爍紅點指示器
+                const glow = Math.sin(Date.now() / 150) * 0.4 + 0.6;
+                ctx.fillStyle = `rgba(239, 68, 68, ${glow})`;
+                ctx.beginPath();
+                ctx.arc(28, 30, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#22d3ee';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText('⚠️ 強風特報 ⬅️', 42, 34);
+                ctx.restore();
+            }
         }
 
         function drawTreasure() {
@@ -898,9 +975,13 @@
                 ctx.fillRect(drawX + 3, drawY + 6, 3, 3);
             }
 
-            // 3. 紅色帥氣斗篷
+            // 3. 紅色帥氣斗篷（如果是第三關，斗篷受強風影響，會自動向右大力擺動）
             ctx.fillStyle = '#dc2626';
-            if (!player.isGrounded) {
+            const isWindLevel = currentScreenIndex === 2;
+            if (isWindLevel && player.isGrounded) {
+                // 地面強風吹拂斗篷向右飄動
+                ctx.fillRect(drawX - 6, drawY + 12, 6, drawH - 14);
+            } else if (!player.isGrounded) {
                 if (player.vx > 0) {
                     ctx.fillRect(drawX - 6, drawY + 8, 8, drawH - 12);
                 } else if (player.vx < 0) {
