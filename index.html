@@ -37,7 +37,7 @@
         <div class="flex justify-between w-full px-4 py-2 bg-slate-800/80 backdrop-blur rounded-t-xl border-t border-x border-slate-700 text-xs md:text-sm">
             <div class="flex items-center gap-2">
                 <span class="text-amber-400"><i class="fa-solid fa-layer-group"></i> 樓層:</span>
-                <span id="ui-floor" class="font-bold text-white">1 / 4</span>
+                <span id="ui-floor" class="font-bold text-white">1 / 10</span>
             </div>
             <div class="flex items-center gap-4">
                 <div>
@@ -51,16 +51,13 @@
             </div>
         </div>
 
-        <!-- 👑 輔助沙盒工具列 -->
+        <!-- 👑 輔助沙盒工具列 (已移除跳關按鈕) -->
         <div class="flex gap-2 justify-between w-full px-3 py-2 bg-slate-900 border-x border-b border-slate-700 text-xs">
             <button id="btn-save" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
                 <i class="fa-solid fa-bookmark"></i> 存檔 (K)
             </button>
             <button id="btn-load" class="flex-1 py-1.5 bg-slate-700 text-slate-400 rounded text-center font-bold transition-all cursor-not-allowed flex items-center justify-center gap-1" disabled>
                 <i class="fa-solid fa-clock-rotate-left"></i> 讀檔 (L)
-            </button>
-            <button id="btn-skip" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-angles-up"></i> 跳關 (N)
             </button>
         </div>
 
@@ -131,7 +128,7 @@
         <p class="hidden md:block"><span class="text-slate-300 font-semibold">電腦操作：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">A</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">D</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">←</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">→</kbd> 移動。</p>
         <p class="hidden md:block">按住 <kbd class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700">空白鍵 (Space)</kbd> 進行蓄力，釋放時會依方向跳出。</p>
         <p class="hidden md:block"><span class="text-rose-400 font-semibold">急停煞車：</span> 按住 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">S</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">↓ 下方向鍵</kbd> 可以在滑行時緊急減速！</p>
-        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔助熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">N</kbd> 快速跳關。</p>
+        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔助熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔。</p>
         <p class="md:hidden"><span class="text-slate-300 font-semibold">手機操作：</span> 使用方向鍵移動、<span class="text-rose-400 font-semibold">下/煞車</span> 進行急停、<span class="text-emerald-400 font-semibold">CHARGE</span> 進行蓄力跳躍。</p>
     </footer>
 
@@ -224,8 +221,7 @@
             speed: 3,                  // 左右走路移動速度
             iceFriction: 0.91,         // 冰面滑動摩擦阻力
             iceAcceleration: 0.20,     // 冰面行走加速度
-            windForceAir: -0.12,       // 【新增】第三關空中的風阻推力（往左吹）
-            windForceGround: -0.35,    // 【新增】第三關地面的緩慢滑行推力（往左吹）
+            windForceAir: -0.12,       // 基礎風阻推力（基準值，動態計算）
             
             // 跳躍高度與蓄力調整
             minJumpY: 5.2,             // 基礎最小垂直跳躍力
@@ -244,8 +240,6 @@
         let totalFalls = 0;
         let gameStartTime = Date.now();
         let isGameFinished = false;
-
-        // 隨地存檔的資料狀態 (一開始為 null)
         let savedState = null;
 
         // 玩家物件
@@ -287,9 +281,9 @@
         let mobileDown = false;
         let mobileCharging = false;
 
-        // 關卡配置 - 所有平台高度為 30px
+        // 關卡配置 - 全新 10 關垂直神塔配置 (每層 30px 高，且出入口精準完美對接，絕不撞頭)
         const screens = [
-            // 關卡 1 (最底層)：教學與基礎跳躍
+            // 關卡 1：經典地基 (出：中偏右)
             [
                 { x: 0, y: 590, w: 480, h: 50, color: '#334155' }, 
                 { x: 40, y: 470, w: 130, h: 30, color: '#475569' },
@@ -299,79 +293,147 @@
                 { x: 350, y: 230, w: 110, h: 30, color: '#475569' },
                 { x: 130, y: 120, w: 220, h: 30, color: '#475569' }, 
             ],
-            // 關卡 2：冰雪考驗 (穿插橫向冰塊台階與豎向冰牆)
+            // 關卡 2：交錯石壁 (進：中，出：左)
             [
-                { x: 0, y: 610, w: 160, h: 30, color: '#4d4d4d' },   
+                { x: 120, y: 610, w: 240, h: 30, color: '#4d4d4d' }, 
+                { x: 40, y: 490, w: 130, h: 30, color: '#4d4d4d' },
+                { x: 310, y: 490, w: 130, h: 30, color: '#4d4d4d' },
+                { x: 180, y: 370, w: 120, h: 30, color: '#4d4d4d' },
+                { x: 30, y: 250, w: 120, h: 30, color: '#4d4d4d' },
+                { x: 330, y: 250, w: 120, h: 30, color: '#4d4d4d' },
+                { x: 0, y: 130, w: 180, h: 30, color: '#4d4d4d' } 
+            ],
+            // 關卡 3：冰雪初顯 (進：左，出：中)
+            [
+                { x: 0, y: 610, w: 180, h: 30, color: '#4d4d4d' },   
                 { x: 320, y: 610, w: 160, h: 30, color: '#4d4d4d' }, 
-                
-                // 1. 橫向冰台階 (中間)：玩家在此起跳會滑行
                 { x: 180, y: 490, w: 120, h: 30, color: '#38bdf8', isIce: true }, 
-                
-                // 2. 左側石造台階
                 { x: 50, y: 380, w: 130, h: 30, color: '#666666' },  
-                
-                // 3. 右側大冰台階 + 豎向冰壁阻擋物
                 { x: 280, y: 260, w: 140, h: 30, color: '#38bdf8', isIce: true }, 
                 { x: 420, y: 180, w: 60, h: 110, color: '#38bdf8', isIce: true }, 
-                
-                // 4. 頂端出口安全大平台
                 { x: 140, y: 120, w: 200, h: 30, color: '#4d4d4d' }, 
             ],
-            // 關卡 3：撞頭（Bonk）地獄 + 【新增強風機制 🌬️】
+            // 關卡 4：寒冰裂隙 (進：中，出：左側偏中)
             [
-                { x: 150, y: 610, w: 180, h: 30, color: '#3b82f6' },
-                { x: 0, y: 490, w: 190, h: 35, color: '#4b5563' },  
-                { x: 290, y: 490, w: 190, h: 35, color: '#4b5563' },
-                { x: 200, y: 390, w: 80, h: 30, color: '#6b7280' },  
-                { x: 40, y: 270, w: 120, h: 30, color: '#6b7280' },
-                { x: 320, y: 270, w: 120, h: 30, color: '#6b7280' },
-                { x: 170, y: 150, w: 140, h: 30, color: '#4b5563' },
-                { x: 0, y: 70, w: 110, h: 30, color: '#4b5563' },
-                { x: 370, y: 70, w: 110, h: 30, color: '#4b5563' },
+                { x: 140, y: 610, w: 200, h: 30, color: '#4d4d4d' },
+                { x: 20, y: 490, w: 120, h: 30, color: '#38bdf8', isIce: true },
+                { x: 340, y: 490, w: 120, h: 30, color: '#38bdf8', isIce: true },
+                { x: 180, y: 370, w: 120, h: 30, color: '#4d4d4d' },
+                { x: 40, y: 250, w: 110, h: 30, color: '#38bdf8', isIce: true },
+                { x: 330, y: 250, w: 110, h: 30, color: '#38bdf8', isIce: true },
+                { x: 100, y: 120, w: 150, h: 30, color: '#4d4d4d' } 
             ],
-            // 關卡 4 (頂層)：極限風暴 
+            // 關卡 5：地底撞擊區 (進：左側偏中，出：雙側)
             [
-                { x: 0, y: 610, w: 120, h: 30, color: '#1e293b' },                     
-                { x: 360, y: 610, w: 120, h: 30, color: '#1e293b' },                   
-                { x: 80, y: 510, w: 110, h: 30, color: '#1e293b' },                    
-                { x: 290, y: 510, w: 110, h: 30, color: '#38bdf8', isIce: true },      
-                { x: 20, y: 410, w: 100, h: 30, color: '#1e293b' },                    
-                { x: 360, y: 410, w: 100, h: 30, color: '#1e293b' },                   
+                { x: 90, y: 610, w: 160, h: 30, color: '#4b5563' },  
+                { x: 0, y: 490, w: 140, h: 30, color: '#4b5563' },   
+                { x: 240, y: 490, w: 240, h: 30, color: '#4b5563' },  
                 
-                // 核心引路台階 (防頂頭)
-                { x: 140, y: 320, w: 100, h: 30, color: '#1e293b' },                   
-                { x: 260, y: 230, w: 100, h: 30, color: '#1e293b' },                   
+                { x: 180, y: 380, w: 120, h: 30, color: '#6b7280' },  
+                { x: 30, y: 270, w: 110, h: 30, color: '#6b7280' },   
+                { x: 340, y: 270, w: 110, h: 30, color: '#6b7280' },  
                 
-                // 終點：改短偏左的終點大平台
-                { x: 100, y: 140, w: 140, h: 30, color: '#b45309' }, 
+                { x: 150, y: 150, w: 180, h: 30, color: '#4b5563' },  
+                { x: 0, y: 70, w: 120, h: 30, color: '#4b5563' },    
+                { x: 360, y: 70, w: 120, h: 30, color: '#4b5563' },   
+            ],
+            // 關卡 6：強風初鳴 [🌬️ 開始起風] (進：雙側，出：中)
+            [
+                { x: 0, y: 610, w: 140, h: 30, color: '#2dd4bf' },   
+                { x: 340, y: 610, w: 140, h: 30, color: '#2dd4bf' }, 
+                { x: 180, y: 490, w: 120, h: 30, color: '#2dd4bf' }, 
+                { x: 50, y: 380, w: 110, h: 30, color: '#2dd4bf' },  
+                { x: 320, y: 270, w: 110, h: 30, color: '#2dd4bf' }, 
+                { x: 130, y: 150, w: 220, h: 30, color: '#2dd4bf' }, 
+            ],
+            // 關卡 7：風暴崖跳 [🌬️ 順風右吹！] (進：中，出：右)
+            [
+                { x: 120, y: 610, w: 240, h: 30, color: '#2dd4bf' },
+                { x: 50, y: 480, w: 100, h: 30, color: '#2dd4bf' },
+                { x: 330, y: 360, w: 100, h: 30, color: '#2dd4bf' },
+                { x: 150, y: 240, w: 180, h: 30, color: '#2dd4bf' },
+                { x: 300, y: 130, w: 180, h: 30, color: '#2dd4bf' }
+            ],
+            // 關卡 8：冰與風之歌 [🌬️ 雙向5秒輪替風+❄️] (進：右，出：左)
+            [
+                { x: 280, y: 610, w: 200, h: 30, color: '#2dd4bf' },
+                { x: 100, y: 480, w: 150, h: 30, color: '#38bdf8', isIce: true },
+                { x: 300, y: 370, w: 120, h: 30, color: '#2dd4bf' },
+                { x: 80, y: 250, w: 140, h: 30, color: '#38bdf8', isIce: true },
+                { x: 0, y: 130, w: 180, h: 30, color: '#2dd4bf' }
+            ],
+            // 關卡 9：登天不對稱神木 [🌬️ 雙向5秒輪替風] (進：左，出：中)
+            [
+                { x: 0, y: 610, w: 200, h: 30, color: '#1e293b' },
+                { x: 280, y: 490, w: 120, h: 30, color: '#1e293b' },
+                { x: 100, y: 390, w: 110, h: 30, color: '#1e293b' },
+                { x: 290, y: 280, w: 110, h: 30, color: '#38bdf8', isIce: true },
+                { x: 130, y: 140, w: 220, h: 30, color: '#1e293b' }
+            ],
+            // 關卡 10：傳奇頂峰 [⬆️ 上升氣流！] (進：中，終點！)
+            [
+                { x: 120, y: 610, w: 240, h: 30, color: '#1e293b' },
+                { x: 40, y: 450, w: 100, h: 30, color: '#b45309' },
+                { x: 340, y: 450, w: 100, h: 30, color: '#b45309' },
+                { x: 140, y: 320, w: 200, h: 30, color: '#d97706' }, 
             ]
         ];
 
         let currentScreenIndex = 0;
 
-        // 寶藏
+        // 寶藏 (配合第10關終點平台，精確放置在中央 x: 220)
         const treasure = {
-            x: 150,
-            y: 100,
+            x: 220,
+            y: 280,
             w: 40,
             h: 40,
             isCollected: false
         };
 
+        // --- 核心風力動態計算函數 ---
+        function getWindForce() {
+            // 第 6 關 (index 5): 向左吹
+            if (currentScreenIndex === 5) {
+                return { x: PHYSICS.windForceAir, y: 0, dir: 'left' };
+            }
+            // 第 7 關 (index 6): 反方向向右吹 ➡️
+            if (currentScreenIndex === 6) {
+                return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
+            }
+            // 第 8、9 關 (index 7, 8): 每 5 秒輪替左右雙向風 🔄
+            if (currentScreenIndex === 7 || currentScreenIndex === 8) {
+                let cycle = Math.floor(Date.now() / 5000) % 2;
+                if (cycle === 0) {
+                    return { x: PHYSICS.windForceAir, y: 0, dir: 'left' };
+                } else {
+                    return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
+                }
+            }
+            // 第 10 關 (index 9): 上升氣流 ⬆️
+            if (currentScreenIndex === 9) {
+                return { x: 0, y: -0.16, dir: 'up' }; // 溫和而穩定的向上升力
+            }
+            return { x: 0, y: 0, dir: 'none' };
+        }
+
+        function isWindActive() {
+            let wind = getWindForce();
+            return wind.x !== 0 || wind.y !== 0;
+        }
+
         // 背景粒子效果
         const particles = [];
         function createParticles() {
             if (particles.length < 40) {
-                // 如果是第三關，增加強風粒子的比重
-                const isWindLevel = currentScreenIndex === 2;
+                const wind = getWindForce();
                 particles.push({
-                    x: isWindLevel ? canvas.width + 10 : Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: isWindLevel ? -3.5 - Math.random() * 2 : (Math.random() - 0.5) * 0.3, // 橫向高速流動
-                    vy: isWindLevel ? (Math.random() - 0.5) * 0.2 : -Math.random() * 0.5 - 0.1,
-                    size: isWindLevel ? Math.random() * 4 + 1 : Math.random() * 2 + 1, // 風粒子的線條感
+                    x: wind.dir === 'left' ? canvas.width + 10 : (wind.dir === 'right' ? -10 : Math.random() * canvas.width),
+                    y: wind.dir === 'up' ? canvas.height + 10 : Math.random() * canvas.height,
+                    vx: 0,
+                    vy: 0,
+                    size: wind.dir !== 'none' ? Math.random() * 4 + 1 : Math.random() * 2 + 1, 
                     alpha: Math.random() * 0.6 + 0.2,
-                    isWindLine: isWindLevel
+                    isWindLine: wind.dir !== 'none'
                 });
             }
         }
@@ -449,31 +511,10 @@
             showToast("⏳ 已載入存檔點位置！");
         }
 
-        function skipLevel() {
-            if (isGameFinished) return;
-            
-            currentScreenIndex = (currentScreenIndex + 1) % screens.length;
-            
-            const targetPlat = screens[currentScreenIndex][0];
-            player.x = targetPlat.x + (targetPlat.w / 2) - (player.w / 2);
-            player.y = targetPlat.y - player.h - 5;
-            player.vx = 0;
-            player.vy = 0;
-            player.isGrounded = true;
-            player.onIce = targetPlat.isIce || false;
-            player.isCharging = false;
-            player.chargeAmount = 0;
-
-            updateUIFloor();
-            playSound('land');
-            showToast(`🚀 已跳越至第 ${currentScreenIndex + 1} 樓！`);
-        }
-
         document.getElementById('btn-save').addEventListener('click', quickSave);
         document.getElementById('btn-load').addEventListener('click', quickLoad);
-        document.getElementById('btn-skip').addEventListener('click', skipLevel);
 
-        // --- 鍵盤監聽事件 ---
+        // --- 鍵盤監聽事件 (已完全清除 N 鍵與 btn-skip 相關邏輯) ---
         window.addEventListener('keydown', (e) => {
             if (isGameFinished) return;
             if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
@@ -489,7 +530,6 @@
             
             if (e.code === 'KeyK') quickSave();   
             if (e.code === 'KeyL') quickLoad();   
-            if (e.code === 'KeyN') skipLevel();   
         });
 
         window.addEventListener('keyup', (e) => {
@@ -616,7 +656,7 @@
                 }
             }
 
-            // 3. 空中重力與硬直時間 + 【強風物理推力套用】
+            // 3. 空中重力與硬直時間
             if (!player.isGrounded) {
                 player.gravity = (player.vy < 0) ? PHYSICS.gravityUp : PHYSICS.gravityDown;
                 player.vy += player.gravity;
@@ -629,14 +669,18 @@
                 }
             }
 
-            // 【新增】第三關強風水平推力修正
-            if (currentScreenIndex === 2) {
+            // 【動態風力套用修正】
+            const wind = getWindForce();
+            if (wind.x !== 0 || wind.y !== 0) {
                 if (!player.isGrounded) {
-                    // 空中強風向左吹拂
-                    player.vx += PHYSICS.windForceAir;
+                    // 空中受風影響 (包含 Y 軸上升氣流)
+                    player.vx += wind.x;
+                    player.vy += wind.y;
                 } else if (!isBraking) {
-                    // 地面時如果沒按煞車，強風會推著你慢慢往左滑動
-                    player.vx += PHYSICS.windForceGround;
+                    // 地面沒煞車時，橫向風會推移玩家
+                    if (wind.x !== 0) {
+                        player.vx += wind.x * 2.91; 
+                    }
                 }
             }
 
@@ -739,7 +783,7 @@
                 player.onIce = false; 
             }
 
-            // 更新冰粒子生命週期
+            // 更新 ice 粒子生命週期
             for (let i = iceParticles.length - 1; i >= 0; i--) {
                 const p = iceParticles[i];
                 p.x += p.vx;
@@ -793,43 +837,68 @@
         // --- 繪製畫布元件 ---
         function draw() {
             let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            if (currentScreenIndex === 0) {
+            if (currentScreenIndex < 3) {
                 bgGradient.addColorStop(0, '#1e1b4b'); 
                 bgGradient.addColorStop(1, '#0f172a');
-            } else if (currentScreenIndex === 1) {
+            } else if (currentScreenIndex < 5) {
                 bgGradient.addColorStop(0, '#0c4a6e'); 
                 bgGradient.addColorStop(1, '#023e8a');
-            } else if (currentScreenIndex === 2) {
-                bgGradient.addColorStop(0, '#0f172a'); // 關卡3：強風暗綠/灰綠色調
+            } else if (currentScreenIndex < 8) {
+                bgGradient.addColorStop(0, '#0f172a'); 
                 bgGradient.addColorStop(1, '#115e59');
             } else {
-                bgGradient.addColorStop(0, '#075985'); 
-                bgGradient.addColorStop(1, '#0c4a6e');
+                bgGradient.addColorStop(0, '#020617'); 
+                bgGradient.addColorStop(1, '#1e1b4b');
             }
             ctx.fillStyle = bgGradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 繪製背景粒子（第三關會呈現流線型風沙）
+            // 繪製背景風雪/強風粒子
+            const wind = getWindForce();
             createParticles();
             particles.forEach((p, idx) => {
+                if (wind.dir === 'left') {
+                    p.vx = -3.5 - Math.random() * 2;
+                    p.vy = (Math.random() - 0.5) * 0.2;
+                } else if (wind.dir === 'right') {
+                    p.vx = 3.5 + Math.random() * 2;
+                    p.vy = (Math.random() - 0.5) * 0.2;
+                } else if (wind.dir === 'up') {
+                    p.vx = (Math.random() - 0.5) * 0.4;
+                    p.vy = -3.5 - Math.random() * 2;
+                } else {
+                    p.vx = (Math.random() - 0.5) * 0.3;
+                    p.vy = -Math.random() * 0.5 - 0.1;
+                }
+
                 p.x += p.vx;
                 p.y += p.vy;
                 
-                // 第三關的風粒子如果移出螢幕就從右側重置
-                if (p.isWindLine) {
-                    if (p.x < -20) {
-                        p.x = canvas.width + 10;
-                        p.y = Math.random() * canvas.height;
-                    }
-                    ctx.strokeStyle = `rgba(165, 243, 252, ${p.alpha})`; // 青色亮風流
-                    ctx.lineWidth = p.size;
-                    ctx.beginPath();
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p.x + 15 + Math.random() * 15, p.y); // 拉長線條感
-                    ctx.stroke();
+                if (wind.dir === 'left' && p.x < -20) {
+                    p.x = canvas.width + 10;
+                    p.y = Math.random() * canvas.height;
+                } else if (wind.dir === 'right' && p.x > canvas.width + 20) {
+                    p.x = -10;
+                    p.y = Math.random() * canvas.height;
+                } else if (wind.dir === 'up' && p.y < -20) {
+                    p.y = canvas.height + 10;
+                    p.x = Math.random() * canvas.width;
+                } else if (p.y < 0 && wind.dir === 'none') {
+                    particles.splice(idx, 1);
                 } else {
-                    if (p.y < 0) {
-                        particles.splice(idx, 1);
+                    if (p.isWindLine || wind.dir !== 'none') {
+                        ctx.strokeStyle = wind.dir === 'up' ? `rgba(168, 85, 247, ${p.alpha})` : `rgba(165, 243, 252, ${p.alpha})`; 
+                        ctx.lineWidth = p.size;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        if (wind.dir === 'up') {
+                            ctx.lineTo(p.x, p.y + 15 + Math.random() * 15);
+                        } else if (wind.dir === 'right') {
+                            ctx.lineTo(p.x - 15 - Math.random() * 15, p.y);
+                        } else {
+                            ctx.lineTo(p.x + 15 + Math.random() * 15, p.y);
+                        }
+                        ctx.stroke();
                     } else {
                         ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
                         ctx.beginPath();
@@ -839,17 +908,14 @@
                 }
             });
 
-            // 繪製滑冰屑/風吹塵埃粒子
             iceParticles.forEach(p => {
                 ctx.fillStyle = `rgba(186, 230, 253, ${p.life / 40})`;
                 ctx.fillRect(p.x, p.y, p.size, p.size);
             });
 
-            // 繪製背景高塔裝飾
             ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.fillRect(80, 0, 320, canvas.height);
 
-            // 繪製平台
             const currentPlatforms = screens[currentScreenIndex];
             currentPlatforms.forEach(plat => {
                 if (plat.isIce) {
@@ -888,27 +954,30 @@
 
             drawPlayer();
 
-            // 【新增】第三關強風動態 UI 警示燈
-            if (currentScreenIndex === 2) {
+            if (wind.dir !== 'none') {
                 ctx.save();
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
-                ctx.strokeStyle = 'rgba(34, 211, 238, 0.5)';
+                ctx.strokeStyle = wind.dir === 'up' ? 'rgba(168, 85, 247, 0.5)' : 'rgba(34, 211, 238, 0.5)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 ctx.roundRect(15, 15, 140, 30, 8);
                 ctx.fill();
                 ctx.stroke();
 
-                // 閃爍紅點指示器
                 const glow = Math.sin(Date.now() / 150) * 0.4 + 0.6;
-                ctx.fillStyle = `rgba(239, 68, 68, ${glow})`;
+                ctx.fillStyle = wind.dir === 'up' ? `rgba(192, 132, 252, ${glow})` : `rgba(239, 68, 68, ${glow})`;
                 ctx.beginPath();
                 ctx.arc(28, 30, 4, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#22d3ee';
+                ctx.fillStyle = wind.dir === 'up' ? '#c084fc' : '#22d3ee';
                 ctx.font = 'bold 11px sans-serif';
-                ctx.fillText('⚠️ 強風特報 ⬅️', 42, 34);
+                
+                let windText = '⚠️ 強風特報 ⬅️';
+                if (wind.dir === 'right') windText = '⚠️ 強風特報 ➡️';
+                if (wind.dir === 'up') windText = '⚠️ 上升氣流 ⬆️';
+                
+                ctx.fillText(windText, 42, 34);
                 ctx.restore();
             }
         }
@@ -975,12 +1044,13 @@
                 ctx.fillRect(drawX + 3, drawY + 6, 3, 3);
             }
 
-            // 3. 紅色帥氣斗篷（如果是第三關，斗篷受強風影響，會自動向右大力擺動）
+            // 3. 紅色帥氣斗篷 
             ctx.fillStyle = '#dc2626';
-            const isWindLevel = currentScreenIndex === 2;
-            if (isWindLevel && player.isGrounded) {
-                // 地面強風吹拂斗篷向右飄動
-                ctx.fillRect(drawX - 6, drawY + 12, 6, drawH - 14);
+            const wind = getWindForce(); // 修正：在這裡定義 wind 變數，解決 ReferenceError 錯誤
+            if (wind.dir === 'left' && player.isGrounded) {
+                ctx.fillRect(drawX - 6, drawY + 12, 6, drawH - 14); 
+            } else if (wind.dir === 'right' && player.isGrounded) {
+                ctx.fillRect(drawX + drawW, drawY + 12, 6, drawH - 14); 
             } else if (!player.isGrounded) {
                 if (player.vx > 0) {
                     ctx.fillRect(drawX - 6, drawY + 8, 8, drawH - 12);
