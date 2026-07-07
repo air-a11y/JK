@@ -137,7 +137,8 @@
     <footer class="mt-4 text-center max-w-lg text-xs text-slate-500 space-y-1">
         <p class="hidden md:block"><span class="text-slate-300 font-semibold">電腦操作：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">A</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">D</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">←</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">→</kbd> 移動。</p>
         <p class="hidden md:block">按住 <kbd class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700">空白鍵 (Space)</kbd> 進行蓄力，釋放時會依方向跳出。</p>
-        <p class="hidden md:block"><span class="text-rose-400 font-semibold">急停煞車：</span> 按住 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">S</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">↓ 下方向鍵</kbd> 可以在滑行時緊急減速！</p>
+        <p class="hidden md:block"><span class="text-rose-400 font-semibold">空中變向：</span> 在空中仍可按住左右鍵進行水平方向微調與減速！</p>
+        <p class="hidden md:block"><span class="text-rose-400 font-semibold">急停煞車：</span> 在地面按住 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">S</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">↓ 下方向鍵</kbd> 可以在滑行時緊急減速！</p>
         <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔育熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">N</kbd> 快速跳關。</p>
         <p class="md:hidden"><span class="text-slate-300 font-semibold">手機操作：</span> 使用方向鍵移動、<span class="text-rose-400 font-semibold">下/煞車</span> 進行急停、<span class="text-emerald-400 font-semibold">CHARGE</span> 進行蓄力跳躍。</p>
     </footer>
@@ -236,6 +237,8 @@
             minJumpX: 2.2,
             maxJumpX: 7.6,
             chargeSpeed: 3.8,
+            airControl: 0.15, // 空中水平微調的加速度
+            maxAirSpeed: 5.5   // 空中水平移動的最大速度限制
         };
 
         // --- 遊戲引擎設定 ---
@@ -351,7 +354,7 @@
                 { x: 280, y: 490, w: 120, h: 30, color: '#1e293b' },
                 { x: 100, y: 390, w: 110, h: 30, color: '#1e293b' },
                 { x: 290, y: 280, w: 110, h: 30, color: '#38bdf8', isIce: true },
-                { x: 170, y: 140, w: 140, h: 30, color: '#1e293b' } // 此處已將寬度從 220 縮短至 140，降低攀爬與起跳的卡關感
+                { x: 170, y: 140, w: 140, h: 30, color: '#1e293b' } 
             ],
             [
                 { x: 120, y: 610, w: 240, h: 30, color: '#1e293b' },
@@ -555,7 +558,16 @@
                 }
             }
 
+            // --- 修改此處：允許空中操作與變向 ---
             if (!player.isGrounded) {
+                if (isMovingLeft) {
+                    player.vx = Math.max(-PHYSICS.maxAirSpeed, player.vx - PHYSICS.airControl);
+                    player.facing = 'left';
+                } else if (isMovingRight) {
+                    player.vx = Math.min(PHYSICS.maxAirSpeed, player.vx + PHYSICS.airControl);
+                    player.facing = 'right';
+                }
+
                 player.gravity = (player.vy < 0) ? PHYSICS.gravityUp : PHYSICS.gravityDown;
                 player.vy += player.gravity;
                 if (player.isBouncing) {
@@ -877,7 +889,6 @@
             playSound('victory');
         }
 
-        // 按下再玩一次按鈕時直接重新整理網頁
         document.getElementById('restart-btn').addEventListener('click', () => {
             window.location.reload(); 
         });
