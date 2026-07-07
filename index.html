@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jump Knight: 攀爬考驗 (仿 Jump King)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background-color: #0f172a;
@@ -50,7 +50,7 @@
             <button id="btn-save" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
                 <i class="fa-solid fa-bookmark"></i> 存檔 (K)
             </button>
-            <button id="btn-load" class="flex-1 py-1.5 bg-slate-700 text-slate-400 rounded text-center font-bold transition-all flex items-center justify-center gap-1">
+            <button id="btn-load" class="flex-1 py-1.5 bg-slate-700 text-slate-400 rounded text-center font-bold transition-all cursor-not-allowed flex items-center justify-center gap-1" disabled>
                 <i class="fa-solid fa-clock-rotate-left"></i> 讀檔 (L)
             </button>
             <button id="btn-skip" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
@@ -65,14 +65,15 @@
                 位置已儲存！
             </div>
 
-            <div id="victory-screen" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center text-center p-4 transition-all duration-500 overflow-y-auto">
-                <div class="text-4xl text-amber-400 mb-1 animate-bounce">
+            <div id="victory-screen" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center text-center p-4 overflow-y-auto transition-all duration-500 z-40">
+                <div class="animate-bounce text-4xl text-amber-400 my-2">
                     <i class="fa-solid fa-crown"></i>
                 </div>
                 <h2 class="text-2xl font-extrabold text-amber-400 mb-1">恭喜登頂！</h2>
                 <p class="text-slate-300 text-xs max-w-xs mb-3">你成功克服了重重難關，證明了自己是真正的躍動之王！</p>
                 
-                <div class="bg-slate-900 p-3 rounded-lg border border-amber-500/30 w-full max-w-xs mb-3 text-left space-y-1 text-xs">
+                <div class="bg-slate-900/80 p-3 rounded-lg border border-amber-500/30 w-full max-w-xs mb-3 text-left space-y-1 text-xs">
+                    <h3 class="font-bold text-amber-500 mb-1 border-b border-slate-700 pb-0.5"><i class="fa-solid fa-star"></i> 本次挑戰數據</h3>
                     <div class="flex justify-between">
                         <span class="text-slate-400">總跳躍次數:</span>
                         <span id="final-jumps" class="font-bold text-emerald-400">0</span>
@@ -87,16 +88,27 @@
                     </div>
                 </div>
 
-                <div class="w-full max-w-xs bg-slate-900/80 border border-slate-700 rounded-lg p-3 mb-4 text-xs">
-                    <h3 class="text-amber-400 font-bold mb-2 flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-trophy"></i> 頂峰傳奇排行榜 (前5名)
-                    </h3>
-                    <div id="leaderboard-list" class="space-y-1 text-left max-h-32 overflow-y-auto text-[11px]">
-                        <p class="text-slate-500 text-center py-2">排行榜載入中...</p>
+                <div id="name-input-section" class="bg-slate-900/90 p-3 rounded-lg border border-indigo-500/40 w-full max-w-xs mb-3 text-left text-xs">
+                    <label for="player-name" class="block font-bold text-indigo-400 mb-1.5"><i class="fa-solid fa-signature"></i> 留下你的傳奇稱號</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="player-name" maxlength="10" placeholder="輸入你的名字..." class="flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white text-xs focus:outline-none focus:border-indigo-500 font-sans">
+                        <button id="submit-score-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1 rounded transition-all text-xs active:scale-95">
+                            送出
+                        </button>
                     </div>
                 </div>
 
-                <button id="restart-btn" class="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all transform active:scale-95 shadow-lg text-xs">
+                <div class="bg-slate-900/80 p-3 rounded-lg border border-cyan-500/30 w-full max-w-xs mb-4 text-left text-xs">
+                    <h3 class="font-bold text-cyan-400 mb-1 border-b border-slate-700 pb-0.5 flex justify-between items-center">
+                        <span><i class="fa-solid fa-trophy text-amber-400"></i> 傳奇殿堂 (最佳前5名)</span>
+                        <button id="clear-leaderboard" class="text-[10px] text-rose-400 hover:text-rose-300 underline font-normal">清除紀錄</button>
+                    </h3>
+                    <ol id="leaderboard-list" class="space-y-1 divide-y divide-slate-800/50 pt-1">
+                        <li class="text-center text-slate-500 py-2">尚無通關紀錄</li>
+                    </ol>
+                </div>
+
+                <button id="restart-btn" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all transform active:scale-95 shadow-lg shadow-amber-500/20 text-sm mb-4">
                     再次挑戰
                 </button>
             </div>
@@ -126,175 +138,9 @@
         <p class="hidden md:block"><span class="text-slate-300 font-semibold">電腦操作：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">A</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">D</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">←</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">→</kbd> 移動。</p>
         <p class="hidden md:block">按住 <kbd class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700">空白鍵 (Space)</kbd> 進行蓄力，釋放時會依方向跳出。</p>
         <p class="hidden md:block"><span class="text-rose-400 font-semibold">急停煞車：</span> 按住 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">S</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">↓ 下方向鍵</kbd> 可以在滑行時緊急減速！</p>
-        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔育熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 雲端存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 雲端讀檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">N</kbd> 快速跳關。</p>
+        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔育熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">N</kbd> 快速跳關。</p>
         <p class="md:hidden"><span class="text-slate-300 font-semibold">手機操作：</span> 使用方向鍵移動、<span class="text-rose-400 font-semibold">下/煞車</span> 進行急停、<span class="text-emerald-400 font-semibold">CHARGE</span> 進行蓄力跳躍。</p>
     </footer>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // 使用您提供的真實 Firebase 帳號配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyD4CxgU3klzot_P4h1JiSiM_BM7s-OaHoQ",
-            authDomain: "jumiknight-bfcc8.firebaseapp.com",
-            projectId: "jumiknight-bfcc8",
-            storageBucket: "jumiknight-bfcc8.firebasestorage.app",
-            messagingSenderId: "637669289832",
-            appId: "1:637669289832:web:bd97f54786adb6cc5430dd",
-            measurementId: "G-H8H3741FTZ"
-        };
-
-        // 初始化 Firebase 和 Firestore 資料庫
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // 將功能註冊到全域，供原本遊戲的核心邏輯呼叫
-        window.quickSave = async function() {
-            if (isGameFinished) return;
-            showToast("💾 雲端儲存中...");
-            try {
-                const stateToSave = {
-                    x: player.x,
-                    y: player.y,
-                    vx: player.vx,
-                    vy: player.vy,
-                    facing: player.facing,
-                    onIce: player.onIce,
-                    isGrounded: player.isGrounded,
-                    currentScreenIndex: currentScreenIndex,
-                    totalJumps: totalJumps,
-                    totalFalls: totalFalls,
-                    savedAt: new Date().toISOString()
-                };
-                
-                // 將進度儲存到雲端數據庫 saves/player1
-                await setDoc(doc(db, "saves", "player1"), stateToSave);
-                
-                // 調整 UI 讀檔按鈕狀態
-                const btnLoad = document.getElementById('btn-load');
-                btnLoad.className = "flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1";
-                
-                playSound('save');
-                showToast("💾 進度已同步至 Firebase 雲端！");
-            } catch (error) {
-                console.error("儲存失敗:", error);
-                showToast("❌ 雲端儲存失敗");
-            }
-        };
-
-        window.quickLoad = async function() {
-            if (isGameFinished) return;
-            showToast("⏳ 讀取雲端存檔中...");
-            try {
-                const docSnap = await getDoc(doc(db, "saves", "player1"));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    player.x = data.x;
-                    player.y = data.y;
-                    player.vx = data.vx;
-                    player.vy = data.vy;
-                    player.facing = data.facing;
-                    player.onIce = data.onIce;
-                    player.isGrounded = data.isGrounded;
-                    player.isCharging = false;
-                    player.chargeAmount = 0;
-                    currentScreenIndex = data.currentScreenIndex;
-                    totalJumps = data.totalJumps || 0;
-                    totalFalls = data.totalFalls || 0;
-                    
-                    // 同步更動數據計分板
-                    document.getElementById('ui-jumps').innerText = totalJumps;
-                    document.getElementById('ui-falls').innerText = totalFalls;
-                    updateUIFloor();
-                    playSound('load');
-                    showToast("⏳ 已成功恢復雲端歷史進度！");
-                } else {
-                    showToast("❓ 雲端無任何存檔紀錄");
-                }
-            } catch (error) {
-                console.error("讀取失敗:", error);
-                showToast("❌ 讀取存檔失敗");
-            }
-        };
-
-        // 刷新排行榜畫面邏輯
-        window.loadLeaderboard = async function() {
-            const listContainer = document.getElementById('leaderboard-list');
-            listContainer.innerHTML = '<p class="text-slate-500 text-center py-2">排行榜載入中...</p>';
-            try {
-                // 從 scores 集合抓取花費時間最少的前 5 筆紀錄
-                const q = query(collection(db, "scores"), orderBy("timeSpent"), limit(5));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    listContainer.innerHTML = '<p class="text-slate-500 text-center py-2">暫無通關數據，快來搶佔沙發！</p>';
-                    return;
-                }
-
-                let html = '<table class="w-full border-collapse"><thead><tr class="text-slate-400 border-b border-slate-700 text-left"><th class="py-1">名次</th><th>玩家</th><th>時間</th><th>跳躍/墜落</th></tr></thead><tbody>';
-                let rank = 1;
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const name = data.playerName || '無名騎士';
-                    const time = data.timeSpent || 0;
-                    const jumps = data.jumps || 0;
-                    const falls = data.falls || 0;
-                    
-                    let medal = `${rank}`;
-                    if(rank === 1) medal = '🥇';
-                    if(rank === 2) medal = '🥈';
-                    if(rank === 3) medal = '🥉';
-
-                    html += `<tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
-                        <td class="py-1 font-bold">${medal}</td>
-                        <td class="text-amber-200 truncate max-w-[80px] font-semibold">${name}</td>
-                        <td class="text-cyan-400 font-mono">${time}秒</td>
-                        <td class="text-slate-400 font-mono">${jumps}/${falls}</td>
-                    </tr>`;
-                    rank++;
-                });
-                html += '</tbody></table>';
-                listContainer.innerHTML = html;
-            } catch (error) {
-                console.error("載入排行榜出錯:", error);
-                listContainer.innerHTML = '<p class="text-rose-400 text-center py-2">❌ 無法載入排行榜</p>';
-            }
-        };
-
-        // 提交紀錄至排行榜
-        window.submitToLeaderboard = async function(finalTimeSeconds) {
-            const playerName = prompt("🏆 登頂成功！請輸入您的騎士大名留念：", "無名騎士");
-            if (!playerName) return;
-
-            try {
-                showToast("🚀 排行榜數據上傳中...");
-                await addDoc(collection(db, "scores"), {
-                    playerName: playerName.trim(),
-                    timeSpent: finalTimeSeconds,
-                    jumps: totalJumps,
-                    falls: totalFalls,
-                    createdAt: new Date().toISOString()
-                });
-                showToast("✨ 排行榜數據更新完畢！");
-                // 重新載入排行榜
-                window.loadLeaderboard();
-            } catch (error) {
-                console.error("提交分數出錯:", error);
-                showToast("❌ 數據上傳失敗");
-            }
-        };
-
-        // 先行嘗試檢查一次雲端是否有存檔，有的話就把讀檔按鈕調亮
-        try {
-            getDoc(doc(db, "saves", "player1")).then((snap) => {
-                if (snap.exists()) {
-                    document.getElementById('btn-load').className = "flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1";
-                }
-            });
-        } catch(e){}
-    </script>
 
     <script>
         // --- 音效合成器 (Web Audio API) ---
@@ -379,31 +225,30 @@
 
         // --- 物理常數配置 ---
         const PHYSICS = {
-            gravityUp: 0.35,           
-            gravityDown: 0.22,         
-            speed: 3,                  
-            iceFriction: 0.91,         
-            iceAcceleration: 0.20,     
-            windForceAir: -0.12,       
-            
-            minJumpY: 5.2,             
-            maxJumpY: 12.2,            
-            minJumpX: 2.2,             
-            maxJumpX: 7.6,             
-            chargeSpeed: 3.8,          
+            gravityUp: 0.35,
+            gravityDown: 0.22,
+            speed: 3,
+            iceFriction: 0.91,
+            iceAcceleration: 0.20,
+            windForceAir: -0.12,
+            minJumpY: 5.2,
+            maxJumpY: 12.2,
+            minJumpX: 2.2,
+            maxJumpX: 7.6,
+            chargeSpeed: 3.8,
         };
 
         // --- 遊戲引擎設定 ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // 遊戲狀態變數
         let totalJumps = 0;
         let totalFalls = 0;
         let gameStartTime = Date.now();
         let isGameFinished = false;
+        let savedState = null;
+        let currentFinalTime = 0; 
 
-        // 玩家物件
         const player = {
             x: 220,
             y: 550, 
@@ -416,31 +261,21 @@
             isGrounded: false,
             onIce: false,              
             facing: 'right',           
-            
             isCharging: false,
             chargeAmount: 0,           
             maxCharge: 100,
             chargeSpeed: PHYSICS.chargeSpeed,
-            
             isBouncing: false,         
             bounceTimer: 0,
         };
 
-        // 按鍵監聽
-        const keys = {
-            left: false,
-            right: false,
-            down: false,
-            space: false
-        };
-
-        // 手機觸控事件
+        const keys = { left: false, right: false, down: false, space: false };
         let mobileLeft = false;
         let mobileRight = false;
         let mobileDown = false;
         let mobileCharging = false;
 
-        // 關卡配置 - 全新 10 關垂直神塔配置
+        // 關卡配置
         const screens = [
             [
                 { x: 0, y: 590, w: 480, h: 50, color: '#334155' }, 
@@ -527,41 +362,20 @@
         ];
 
         let currentScreenIndex = 0;
+        const treasure = { x: 220, y: 280, w: 40, h: 40, isCollected: false };
 
-        // 寶藏 
-        const treasure = {
-            x: 220,
-            y: 280,
-            w: 40,
-            h: 40,
-            isCollected: false
-        };
-
-        // --- 核心風力動態計算函數 ---
+        // 風力計算
         function getWindForce() {
             if (currentScreenIndex === 5 || currentScreenIndex === 8) {
                 let cycle = Math.floor(Date.now() / 5000) % 2;
-                if (cycle === 0) {
-                    return { x: PHYSICS.windForceAir, y: 0, dir: 'left' };
-                } else {
-                    return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
-                }
+                return cycle === 0 ? { x: PHYSICS.windForceAir, y: 0, dir: 'left' } : { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
             }
-            if (currentScreenIndex === 6) {
-                return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
-            }
-            if (currentScreenIndex === 9) {
-                return { x: 0, y: -0.16, dir: 'up' }; 
-            }
+            if (currentScreenIndex === 6) return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
+            if (currentScreenIndex === 9) return { x: 0, y: -0.16, dir: 'up' }; 
             return { x: 0, y: 0, dir: 'none' };
         }
 
-        function isWindActive() {
-            let wind = getWindForce();
-            return wind.x !== 0 || wind.y !== 0;
-        }
-
-        // 背景粒子效果
+        // 粒子
         const particles = [];
         function createParticles() {
             if (particles.length < 40) {
@@ -569,8 +383,7 @@
                 particles.push({
                     x: wind.dir === 'left' ? canvas.width + 10 : (wind.dir === 'right' ? -10 : Math.random() * canvas.width),
                     y: wind.dir === 'up' ? canvas.height + 10 : Math.random() * canvas.height,
-                    vx: 0,
-                    vy: 0,
+                    vx: 0, vy: 0,
                     size: wind.dir !== 'none' ? Math.random() * 4 + 1 : Math.random() * 2 + 1, 
                     alpha: Math.random() * 0.6 + 0.2,
                     isWindLine: wind.dir !== 'none'
@@ -578,7 +391,6 @@
             }
         }
 
-        // 冰雪花碎粒子 
         const iceParticles = [];
         function createIceSplash(x, y, isBraking = false) {
             const count = isBraking ? 4 : 2; 
@@ -594,14 +406,12 @@
             }
         }
 
-        // --- HUD Toast 浮出提示系統 ---
         let toastTimeout;
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
             toast.classList.remove('hidden', 'opacity-0');
             toast.classList.add('opacity-100');
-            
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('opacity-100');
@@ -610,59 +420,58 @@
             }, 1500);
         }
 
-        // --- 沙盒與作弊功能實作 (對接 Firebase 外觀) ---
-        function triggerSave() {
-            if (window.quickSave) {
-                window.quickSave();
-            }
+        // 輔助功能
+        function quickSave() {
+            if (isGameFinished) return;
+            savedState = {
+                x: player.x, y: player.y, vx: player.vx, vy: player.vy,
+                facing: player.facing, onIce: player.onIce, isGrounded: player.isGrounded,
+                currentScreenIndex: currentScreenIndex
+            };
+            const btnLoad = document.getElementById('btn-load');
+            btnLoad.removeAttribute('disabled');
+            btnLoad.className = "flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1";
+            playSound('save');
+            showToast("💾 當前位置已儲存！");
         }
 
-        function triggerLoad() {
-            if (window.quickLoad) {
-                window.quickLoad();
-            }
+        function quickLoad() {
+            if (isGameFinished || !savedState) return;
+            player.x = savedState.x; player.y = savedState.y; player.vx = savedState.vx; player.vy = savedState.vy;
+            player.facing = savedState.facing; player.onIce = savedState.onIce; player.isGrounded = savedState.isGrounded;
+            player.isCharging = false; player.chargeAmount = 0;
+            currentScreenIndex = savedState.currentScreenIndex;
+            updateUIFloor();
+            playSound('load');
+            showToast("⏳ 已載入存檔點位置！");
         }
 
         function skipLevel() {
             if (isGameFinished) return;
-            
             currentScreenIndex = (currentScreenIndex + 1) % screens.length;
-            
             const targetPlat = screens[currentScreenIndex][0];
             player.x = targetPlat.x + (targetPlat.w / 2) - (player.w / 2);
             player.y = targetPlat.y - player.h - 5;
-            player.vx = 0;
-            player.vy = 0;
-            player.isGrounded = true;
-            player.onIce = targetPlat.isIce || false;
-            player.isCharging = false;
-            player.chargeAmount = 0;
-
-            updateUIFloor();
-            playSound('land');
+            player.vx = 0; player.vy = 0; player.isGrounded = true;
+            player.onIce = targetPlat.isIce || false; player.isCharging = false; player.chargeAmount = 0;
+            updateUIFloor(); playSound('land');
             showToast(`🚀 已跳越至第 ${currentScreenIndex + 1} 樓！`);
         }
 
-        document.getElementById('btn-save').addEventListener('click', triggerSave);
-        document.getElementById('btn-load').addEventListener('click', triggerLoad);
+        document.getElementById('btn-save').addEventListener('click', quickSave);
+        document.getElementById('btn-load').addEventListener('click', quickLoad);
         document.getElementById('btn-skip').addEventListener('click', skipLevel);
 
-        // --- 鍵盤監聽事件 ---
+        // 控制事件
         window.addEventListener('keydown', (e) => {
+            if (document.activeElement === document.getElementById('player-name')) return;
             if (isGameFinished) return;
             if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
             if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = true;
-            if (['ArrowDown', 'KeyS'].includes(e.code)) {
-                e.preventDefault();
-                keys.down = true;
-            }
-            if (e.code === 'Space') {
-                e.preventDefault(); 
-                keys.space = true;
-            }
-            
-            if (e.code === 'KeyK') triggerSave();   
-            if (e.code === 'KeyL') triggerLoad();   
+            if (['ArrowDown', 'KeyS'].includes(e.code)) { e.preventDefault(); keys.down = true; }
+            if (e.code === 'Space') { e.preventDefault(); keys.space = true; }
+            if (e.code === 'KeyK') quickSave();   
+            if (e.code === 'KeyL') quickLoad();   
             if (e.code === 'KeyN') skipLevel();   
         });
 
@@ -670,12 +479,9 @@
             if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = false;
             if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = false;
             if (['ArrowDown', 'KeyS'].includes(e.code)) keys.down = false;
-            if (e.code === 'Space') {
-                keys.space = false;
-            }
+            if (e.code === 'Space') keys.space = false;
         });
 
-        // --- 手機按鍵監聽事件 ---
         const btnLeft = document.getElementById('btn-left');
         const btnRight = document.getElementById('btn-right');
         const btnDown = document.getElementById('btn-down');
@@ -685,26 +491,16 @@
         btnLeft.addEventListener('touchend', () => mobileLeft = false);
         btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); mobileRight = true; });
         btnRight.addEventListener('touchend', () => mobileRight = false);
-        
         btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); mobileDown = true; });
         btnDown.addEventListener('touchend', () => mobileDown = false);
-        
-        btnJump.addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            mobileCharging = true; 
-        });
-        btnJump.addEventListener('touchend', () => { 
-            mobileCharging = false; 
-        });
+        btnJump.addEventListener('touchstart', (e) => { e.preventDefault(); mobileCharging = true; });
+        btnJump.addEventListener('touchend', () => mobileCharging = false);
 
         window.addEventListener('contextmenu', e => e.preventDefault());
 
-        // --- 物理與撞擊偵測 ---
         function checkCollision(rect1, rect2) {
-            return rect1.x < rect2.x + rect2.w &&
-                   rect1.x + rect1.w > rect2.x &&
-                   rect1.y < rect2.y + rect2.h &&
-                   rect1.y + rect1.h > rect2.y;
+            return rect1.x < rect2.x + rect2.w && rect1.x + rect1.w > rect2.x &&
+                   rect1.y < rect2.y + rect2.h && rect1.y + rect1.h > rect2.y;
         }
 
         function updatePhysics() {
@@ -718,9 +514,7 @@
             if (player.isGrounded) {
                 if (isBraking) {
                     player.vx *= 0.5; 
-                    if (Math.abs(player.vx) > 0.1) {
-                        createIceSplash(player.x, player.y, true);
-                    }
+                    if (Math.abs(player.vx) > 0.1) createIceSplash(player.x, player.y, true);
                 } else if (player.onIce) {
                     if (isMovingLeft && !player.isCharging) {
                         player.vx = Math.max(-player.speed, player.vx - PHYSICS.iceAcceleration);
@@ -731,55 +525,30 @@
                     } else {
                         player.vx *= PHYSICS.iceFriction;
                     }
-
-                    if (Math.abs(player.vx) > 0.4) {
-                        createIceSplash(player.x, player.y);
-                    }
+                    if (Math.abs(player.vx) > 0.4) createIceSplash(player.x, player.y);
                 } else {
-                    if (isMovingLeft && !player.isCharging) {
-                        player.vx = -player.speed;
-                        player.facing = 'left';
-                    } else if (isMovingRight && !player.isCharging) {
-                        player.vx = player.speed;
-                        player.facing = 'right';
-                    } else {
-                        player.vx = 0;
-                    }
+                    if (isMovingLeft && !player.isCharging) { player.vx = -player.speed; player.facing = 'left'; }
+                    else if (isMovingRight && !player.isCharging) { player.vx = player.speed; player.facing = 'right'; }
+                    else { player.vx = 0; }
                 }
             }
 
             if (player.isGrounded) {
                 if (isPressingCharge) {
                     player.isCharging = true;
-                    
-                    if (!player.onIce) {
-                        player.vx = 0; 
-                    } else {
-                        const slideFriction = isBraking ? 0.70 : PHYSICS.iceFriction;
-                        player.vx *= slideFriction; 
-                        createIceSplash(player.x, player.y, isBraking);
-                    }
+                    if (!player.onIce) { player.vx = 0; } 
+                    else { player.vx *= (isBraking ? 0.70 : PHYSICS.iceFriction); createIceSplash(player.x, player.y, isBraking); }
                     player.chargeAmount = Math.min(player.maxCharge, player.chargeAmount + player.chargeSpeed);
                 } else if (player.isCharging) {
                     const chargeRatio = player.chargeAmount / player.maxCharge;
-                    
                     player.vy = -(PHYSICS.minJumpY + chargeRatio * (PHYSICS.maxJumpY - PHYSICS.minJumpY));
-                    
                     let bonusX = player.onIce ? player.vx * 0.8 : 0;
 
-                    if (isMovingLeft) {
-                        player.vx = -(PHYSICS.minJumpX + chargeRatio * (PHYSICS.maxJumpX - PHYSICS.minJumpX)) + bonusX;
-                        player.facing = 'left';
-                    } else if (isMovingRight) {
-                        player.vx = (PHYSICS.minJumpX + chargeRatio * (PHYSICS.maxJumpX - PHYSICS.minJumpX)) + bonusX;
-                        player.facing = 'right';
-                    } else {
-                        player.vx = bonusX; 
-                    }
+                    if (isMovingLeft) { player.vx = -(PHYSICS.minJumpX + chargeRatio * (PHYSICS.maxJumpX - PHYSICS.minJumpX)) + bonusX; player.facing = 'left'; }
+                    else if (isMovingRight) { player.vx = (PHYSICS.minJumpX + chargeRatio * (PHYSICS.maxJumpX - PHYSICS.minJumpX)) + bonusX; player.facing = 'right'; }
+                    else { player.vx = bonusX; }
 
-                    player.isGrounded = false;
-                    player.isCharging = false;
-                    player.chargeAmount = 0;
+                    player.isGrounded = false; player.isCharging = false; player.chargeAmount = 0;
                     totalJumps++;
                     document.getElementById('ui-jumps').innerText = totalJumps;
                     playSound('jump');
@@ -789,51 +558,27 @@
             if (!player.isGrounded) {
                 player.gravity = (player.vy < 0) ? PHYSICS.gravityUp : PHYSICS.gravityDown;
                 player.vy += player.gravity;
-                
                 if (player.isBouncing) {
                     player.bounceTimer--;
-                    if (player.bounceTimer <= 0) {
-                        player.isBouncing = false;
-                    }
+                    if (player.bounceTimer <= 0) player.isBouncing = false;
                 }
             }
 
             const wind = getWindForce();
             if (wind.x !== 0 || wind.y !== 0) {
-                if (!player.isGrounded) {
-                    player.vx += wind.x;
-                    player.vy += wind.y;
-                } else if (!isBraking) {
-                    if (wind.x !== 0) {
-                        player.vx += wind.x * 2.91; 
-                    }
-                }
+                if (!player.isGrounded) { player.vx += wind.x; player.vy += wind.y; }
+                else if (!isBraking && wind.x !== 0) { player.vx += wind.x * 2.91; }
             }
 
             player.x += player.vx;
-            
             if (player.x < 0) {
                 player.x = 0;
-                if (!player.isGrounded) {
-                    player.vx = -player.vx * 0.6; 
-                    player.facing = 'right';
-                    player.isBouncing = true;
-                    player.bounceTimer = 15;
-                    playSound('bonk');
-                } else {
-                    player.vx = 0;
-                }
+                if (!player.isGrounded) { player.vx = -player.vx * 0.6; player.facing = 'right'; player.isBouncing = true; player.bounceTimer = 15; playSound('bonk'); }
+                else player.vx = 0;
             } else if (player.x + player.w > canvas.width) {
                 player.x = canvas.width - player.w;
-                if (!player.isGrounded) {
-                    player.vx = -player.vx * 0.6; 
-                    player.facing = 'left';
-                    player.isBouncing = true;
-                    player.bounceTimer = 15;
-                    playSound('bonk');
-                } else {
-                    player.vx = 0;
-                }
+                if (!player.isGrounded) { player.vx = -player.vx * 0.6; player.facing = 'left'; player.isBouncing = true; player.bounceTimer = 15; playSound('bonk'); }
+                else player.vx = 0;
             }
 
             const currentPlatforms = screens[currentScreenIndex];
@@ -841,28 +586,12 @@
                 if (checkCollision(player, plat)) {
                     if (player.vx > 0) { 
                         player.x = plat.x - player.w;
-                        if (!player.isGrounded) {
-                            const bounceFactor = plat.isIce ? 0.8 : 0.5;
-                            player.vx = -player.vx * bounceFactor; 
-                            player.facing = 'left';
-                            player.isBouncing = true;
-                            player.bounceTimer = 15;
-                            playSound('bonk');
-                        } else {
-                            player.vx = 0;
-                        }
+                        if (!player.isGrounded) { player.vx = -player.vx * (plat.isIce ? 0.8 : 0.5); player.facing = 'left'; player.isBouncing = true; player.bounceTimer = 15; playSound('bonk'); }
+                        else player.vx = 0;
                     } else if (player.vx < 0) { 
                         player.x = plat.x + plat.w;
-                        if (!player.isGrounded) {
-                            const bounceFactor = plat.isIce ? 0.8 : 0.5;
-                            player.vx = -player.vx * bounceFactor; 
-                            player.facing = 'right';
-                            player.isBouncing = true;
-                            player.bounceTimer = 15;
-                            playSound('bonk');
-                        } else {
-                            player.vx = 0;
-                        }
+                        if (!player.isGrounded) { player.vx = -player.vx * (plat.isIce ? 0.8 : 0.5); player.facing = 'right'; player.isBouncing = true; player.bounceTimer = 15; playSound('bonk'); }
+                        else player.vx = 0;
                     }
                 }
             }
@@ -873,75 +602,35 @@
             for (let plat of currentPlatforms) {
                 if (checkCollision(player, plat)) {
                     if (player.vy > 0 && player.y + player.h - player.vy <= plat.y + 6) {
-                        player.y = plat.y - player.h;
-                        player.vy = 0;
-                        
+                        player.y = plat.y - player.h; player.vy = 0;
                         player.onIce = plat.isIce || false;
-
-                        if (!player.onIce) {
-                            player.vx = 0;
-                        }
-                        
-                        if (!player.isGrounded) {
-                            player.isGrounded = true;
-                            player.isBouncing = false;
-                            playSound('land');
-                        }
+                        if (!player.onIce) player.vx = 0;
+                        if (!player.isGrounded) { player.isGrounded = true; player.isBouncing = false; playSound('land'); }
                         onPlatform = true;
                     }
                     else if (player.vy < 0 && player.y - player.vy >= plat.y + plat.h - 6) {
-                        player.y = plat.y + plat.h;
-                        player.vy = 0; 
-                        player.vx = player.vx * 0.2; 
-                        playSound('bonk');
+                        player.y = plat.y + plat.h; player.vy = 0; player.vx = player.vx * 0.2; playSound('bonk');
                     }
                 }
             }
 
-            if (!onPlatform) {
-                player.isGrounded = false;
-                player.onIce = false; 
-            }
+            if (!onPlatform) { player.isGrounded = false; player.onIce = false; }
 
             for (let i = iceParticles.length - 1; i >= 0; i--) {
-                const p = iceParticles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life--;
-                if (p.life <= 0) {
-                    iceParticles.splice(i, 1);
-                }
+                const p = iceParticles[i]; p.x += p.vx; p.y += p.vy; p.life--;
+                if (p.life <= 0) iceParticles.splice(i, 1);
             }
 
             if (player.y < 0) {
-                if (currentScreenIndex < screens.length - 1) {
-                    currentScreenIndex++;
-                    player.y = canvas.height - player.h - 5;
-                    updateUIFloor();
-                } else {
-                    player.y = 0;
-                    player.vy = 0;
-                }
+                if (currentScreenIndex < screens.length - 1) { currentScreenIndex++; player.y = canvas.height - player.h - 5; updateUIFloor(); }
+                else { player.y = 0; player.vy = 0; }
             } else if (player.y > canvas.height) {
-                if (currentScreenIndex > 0) {
-                    currentScreenIndex--;
-                    player.y = 5;
-                    player.vx = player.vx * 0.5; 
-                    totalFalls++;
-                    document.getElementById('ui-falls').innerText = totalFalls;
-                    playSound('fall');
-                    updateUIFloor();
-                } else {
-                    player.y = canvas.height - player.h - 55; 
-                    player.vy = 0;
-                    player.vx = 0;
-                    player.isGrounded = true;
-                }
+                if (currentScreenIndex > 0) { currentScreenIndex--; player.y = 5; player.vx = player.vx * 0.5; totalFalls++; document.getElementById('ui-falls').innerText = totalFalls; playSound('fall'); updateUIFloor(); }
+                else { player.y = canvas.height - player.h - 55; player.vy = 0; player.vx = 0; player.isGrounded = true; }
             }
 
             if (currentScreenIndex === screens.length - 1 && !isGameFinished) {
-                const treasureRect = { x: treasure.x, y: treasure.y, w: treasure.w, h: treasure.h };
-                if (checkCollision(player, treasureRect)) {
+                if (checkCollision(player, { x: treasure.x, y: treasure.y, w: treasure.w, h: treasure.h })) {
                     gameFinished();
                 }
             }
@@ -951,202 +640,102 @@
             document.getElementById('ui-floor').innerText = `${currentScreenIndex + 1} / ${screens.length}`;
         }
 
-        // --- 繪製畫布元件 ---
         function draw() {
             let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            if (currentScreenIndex < 3) {
-                bgGradient.addColorStop(0, '#1e1b4b'); 
-                bgGradient.addColorStop(1, '#0f172a');
-            } else if (currentScreenIndex < 5) {
-                bgGradient.addColorStop(0, '#0c4a6e'); 
-                bgGradient.addColorStop(1, '#023e8a');
-            } else if (currentScreenIndex < 8) {
-                bgGradient.addColorStop(0, '#0f172a'); 
-                bgGradient.addColorStop(1, '#115e59');
-            } else {
-                bgGradient.addColorStop(0, '#020617'); 
-                bgGradient.addColorStop(1, '#1e1b4b');
-            }
-            ctx.fillStyle = bgGradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (currentScreenIndex < 3) { bgGradient.addColorStop(0, '#1e1b4b'); bgGradient.addColorStop(1, '#0f172a'); }
+            else if (currentScreenIndex < 5) { bgGradient.addColorStop(0, '#0c4a6e'); bgGradient.addColorStop(1, '#023e8a'); }
+            else if (currentScreenIndex < 8) { bgGradient.addColorStop(0, '#0f172a'); bgGradient.addColorStop(1, '#115e59'); }
+            else { bgGradient.addColorStop(0, '#020617'); bgGradient.addColorStop(1, '#1e1b4b'); }
+            ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const wind = getWindForce();
             createParticles();
             particles.forEach((p, idx) => {
-                if (wind.dir === 'left') {
-                    p.vx = -3.5 - Math.random() * 2;
-                    p.vy = (Math.random() - 0.5) * 0.2;
-                } else if (wind.dir === 'right') {
-                    p.vx = 3.5 + Math.random() * 2;
-                    p.vy = (Math.random() - 0.5) * 0.2;
-                } else if (wind.dir === 'up') {
-                    p.vx = (Math.random() - 0.5) * 0.4;
-                    p.vy = -3.5 - Math.random() * 2;
-                } else {
-                    p.vx = (Math.random() - 0.5) * 0.3;
-                    p.vy = -Math.random() * 0.5 - 0.1;
-                }
+                if (wind.dir === 'left') { p.vx = -3.5 - Math.random() * 2; p.vy = (Math.random() - 0.5) * 0.2; }
+                else if (wind.dir === 'right') { p.vx = 3.5 + Math.random() * 2; p.vy = (Math.random() - 0.5) * 0.2; }
+                else if (wind.dir === 'up') { p.vx = (Math.random() - 0.5) * 0.4; p.vy = -3.5 - Math.random() * 2; }
+                else { p.vx = (Math.random() - 0.5) * 0.3; p.vy = -Math.random() * 0.5 - 0.1; }
 
-                p.x += p.vx;
-                p.y += p.vy;
-                
-                if (wind.dir === 'left' && p.x < -20) {
-                    p.x = canvas.width + 10;
-                    p.y = Math.random() * canvas.height;
-                } else if (wind.dir === 'right' && p.x > canvas.width + 20) {
-                    p.x = -10;
-                    p.y = Math.random() * canvas.height;
-                } else if (wind.dir === 'up' && p.y < -20) {
-                    p.y = canvas.height + 10;
-                    p.x = Math.random() * canvas.width;
-                } else if (p.y < 0 && wind.dir === 'none') {
-                    particles.splice(idx, 1);
-                } else {
+                p.x += p.vx; p.y += p.vy;
+                if (wind.dir === 'left' && p.x < -20) { p.x = canvas.width + 10; p.y = Math.random() * canvas.height; }
+                else if (wind.dir === 'right' && p.x > canvas.width + 20) { p.x = -10; p.y = Math.random() * canvas.height; }
+                else if (wind.dir === 'up' && p.y < -20) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
+                else if (p.y < 0 && wind.dir === 'none') { particles.splice(idx, 1); }
+                else {
                     if (p.isWindLine || wind.dir !== 'none') {
                         ctx.strokeStyle = wind.dir === 'up' ? `rgba(168, 85, 247, ${p.alpha})` : `rgba(165, 243, 252, ${p.alpha})`; 
-                        ctx.lineWidth = p.size;
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        if (wind.dir === 'up') {
-                            ctx.lineTo(p.x, p.y + 15 + Math.random() * 15);
-                        } else if (wind.dir === 'right') {
-                            ctx.lineTo(p.x - 15 - Math.random() * 15, p.y);
-                        } else {
-                            ctx.lineTo(p.x + 15 + Math.random() * 15, p.y);
-                        }
+                        ctx.lineWidth = p.size; ctx.beginPath(); ctx.moveTo(p.x, p.y);
+                        if (wind.dir === 'up') ctx.lineTo(p.x, p.y + 15 + Math.random() * 15);
+                        else if (wind.dir === 'right') ctx.lineTo(p.x - 15 - Math.random() * 15, p.y);
+                        else ctx.lineTo(p.x + 15 + Math.random() * 15, p.y);
                         ctx.stroke();
                     } else {
-                        ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                        ctx.fill();
+                        ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
                     }
                 }
             });
 
             iceParticles.forEach(p => {
-                ctx.fillStyle = `rgba(186, 230, 253, ${p.life / 40})`;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.fillStyle = `rgba(186, 230, 253, ${p.life / 40})`; ctx.fillRect(p.x, p.y, p.size, p.size);
             });
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-            ctx.fillRect(80, 0, 320, canvas.height);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)'; ctx.fillRect(80, 0, 320, canvas.height);
 
             const currentPlatforms = screens[currentScreenIndex];
             currentPlatforms.forEach(plat => {
                 if (plat.isIce) {
                     let iceGrad = ctx.createLinearGradient(plat.x, plat.y, plat.x, plat.y + plat.h);
-                    iceGrad.addColorStop(0, '#7dd3fc'); 
-                    iceGrad.addColorStop(0.3, '#38bdf8');
-                    iceGrad.addColorStop(1, '#0284c7'); 
-                    ctx.fillStyle = iceGrad;
-                    ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
-
-                    ctx.fillStyle = '#f0f9ff';
-                    ctx.fillRect(plat.x, plat.y, plat.w, 4);
-
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath();
-                    for (let lx = plat.x + 15; lx < plat.x + plat.w; lx += 40) {
-                        ctx.moveTo(lx, plat.y + 4);
-                        ctx.lineTo(lx - 8, plat.y + plat.h - 4);
-                    }
+                    iceGrad.addColorStop(0, '#7dd3fc'); iceGrad.addColorStop(0.3, '#38bdf8'); iceGrad.addColorStop(1, '#0284c7'); 
+                    ctx.fillStyle = iceGrad; ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
+                    ctx.fillStyle = '#f0f9ff'; ctx.fillRect(plat.x, plat.y, plat.w, 4);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 1.5; ctx.beginPath();
+                    for (let lx = plat.x + 15; lx < plat.x + plat.w; lx += 40) { ctx.moveTo(lx, plat.y + 4); ctx.lineTo(lx - 8, plat.y + plat.h - 4); }
                     ctx.stroke();
                 } else {
-                    ctx.fillStyle = plat.color;
-                    ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
-
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-                    ctx.fillRect(plat.x, plat.y, plat.w, 4);
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                    ctx.fillRect(plat.x, plat.y + plat.h - 4, plat.w, 4);
+                    ctx.fillStyle = plat.color; ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; ctx.fillRect(plat.x, plat.y, plat.w, 4);
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; ctx.fillRect(plat.x, plat.y + plat.h - 4, plat.w, 4);
                 }
             });
 
-            if (currentScreenIndex === screens.length - 1) {
-                drawTreasure();
-            }
-
+            if (currentScreenIndex === screens.length - 1) drawTreasure();
             drawPlayer();
 
             if (wind.dir !== 'none') {
-                ctx.save();
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
-                ctx.strokeStyle = wind.dir === 'up' ? 'rgba(168, 85, 247, 0.5)' : 'rgba(34, 211, 238, 0.5)';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.roundRect(15, 15, 140, 30, 8);
-                ctx.fill();
-                ctx.stroke();
-
+                ctx.save(); ctx.fillStyle = 'rgba(15, 23, 42, 0.7)'; ctx.strokeStyle = wind.dir === 'up' ? 'rgba(168, 85, 247, 0.5)' : 'rgba(34, 211, 238, 0.5)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.roundRect(15, 15, 140, 30, 8); ctx.fill(); ctx.stroke();
                 const glow = Math.sin(Date.now() / 150) * 0.4 + 0.6;
-                ctx.fillStyle = wind.dir === 'up' ? `rgba(192, 132, 252, ${glow})` : `rgba(239, 68, 68, ${glow})`;
-                ctx.beginPath();
-                ctx.arc(28, 30, 4, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = wind.dir === 'up' ? '#c084fc' : '#22d3ee';
-                ctx.font = 'bold 11px sans-serif';
-                
+                ctx.fillStyle = wind.dir === 'up' ? `rgba(192, 132, 252, ${glow})` : `rgba(239, 68, 68, ${glow})`; ctx.beginPath(); ctx.arc(28, 30, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = wind.dir === 'up' ? '#c084fc' : '#22d3ee'; ctx.font = 'bold 11px sans-serif';
                 let windText = '⚠️ 強風特報 ⬅️';
                 if (wind.dir === 'right') windText = '⚠️ 強風特報 ➡️';
                 if (wind.dir === 'up') windText = '⚠️ 上升氣流 ⬆️';
-                
-                ctx.fillText(windText, 42, 34);
-                ctx.restore();
+                ctx.fillText(windText, 42, 34); ctx.restore();
             }
         }
 
         function drawTreasure() {
-            ctx.fillStyle = '#d97706'; 
-            ctx.fillRect(treasure.x, treasure.y, treasure.w, treasure.h);
-            
-            ctx.fillStyle = '#b45309';
-            ctx.fillRect(treasure.x - 2, treasure.y, treasure.w + 4, 12);
-            
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillRect(treasure.x + treasure.w / 2 - 5, treasure.y + 12, 10, 10);
-            
+            ctx.fillStyle = '#d97706'; ctx.fillRect(treasure.x, treasure.y, treasure.w, treasure.h);
+            ctx.fillStyle = '#b45309'; ctx.fillRect(treasure.x - 2, treasure.y, treasure.w + 4, 12);
+            ctx.fillStyle = '#f59e0b'; ctx.fillRect(treasure.x + treasure.w / 2 - 5, treasure.y + 12, 10, 10);
             const pulse = Math.sin(Date.now() / 200) * 10 + 15;
-            ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(treasure.x + treasure.w / 2, treasure.y + treasure.h / 2, pulse, 0, Math.PI * 2);
-            ctx.stroke();
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(treasure.x + treasure.w / 2, treasure.y + treasure.h / 2, pulse, 0, Math.PI * 2); ctx.stroke();
         }
 
         function drawPlayer() {
             ctx.save();
-            
-            let drawX = player.x;
-            let drawY = player.y;
-            let drawW = player.w;
-            let drawH = player.h;
-
+            let drawX = player.x, drawY = player.y, drawW = player.w, drawH = player.h;
             const isBraking = (keys.down || mobileDown) && player.isGrounded;
 
             if (player.isCharging) {
                 const chargeRatio = player.chargeAmount / player.maxCharge;
-                drawH = player.h - (12 * chargeRatio); 
-                drawY = player.y + (12 * chargeRatio); 
-                drawW = player.w + (4 * chargeRatio);  
-                drawX = player.x - (2 * chargeRatio);
-                
+                drawH = player.h - (12 * chargeRatio); drawY = player.y + (12 * chargeRatio); drawW = player.w + (4 * chargeRatio); drawX = player.x - (2 * chargeRatio);
                 drawX += (Math.random() - 0.5) * (2 * chargeRatio);
             } else if (isBraking) {
-                drawH = player.h - 6; 
-                drawY = player.y + 6; 
-                drawW = player.w + 2;
-                drawX = player.x - 1;
+                drawH = player.h - 6; drawY = player.y + 6; drawW = player.w + 2; drawX = player.x - 1;
             }
 
-            ctx.fillStyle = '#475569';
-            ctx.fillRect(drawX, drawY, drawW, drawH);
-
-            ctx.fillStyle = '#334155';
-            ctx.fillRect(drawX + 2, drawY + 2, drawW - 4, 12);
-            
+            ctx.fillStyle = '#475569'; ctx.fillRect(drawX, drawY, drawW, drawH);
+            ctx.fillStyle = '#334155'; ctx.fillRect(drawX + 2, drawY + 2, drawW - 4, 12);
             ctx.fillStyle = '#f1f5f9';
             if (player.facing === 'right') {
                 ctx.fillRect(drawX + drawW - 10, drawY + 6, 8, 3);
@@ -1160,102 +749,147 @@
 
             ctx.fillStyle = '#dc2626';
             const wind = getWindForce();
-            if (wind.dir === 'left' && player.isGrounded) {
-                ctx.fillRect(drawX - 6, drawY + 12, 6, drawH - 14); 
-            } else if (wind.dir === 'right' && player.isGrounded) {
-                ctx.fillRect(drawX + drawW, drawY + 12, 6, drawH - 14); 
-            } else if (!player.isGrounded) {
-                if (player.vx > 0) {
-                    ctx.fillRect(drawX - 6, drawY + 8, 8, drawH - 12);
-                } else if (player.vx < 0) {
-                    ctx.fillRect(drawX + drawW - 2, drawY + 8, 8, drawH - 12);
-                } else {
-                    ctx.fillRect(drawX - 2, drawY + 10, drawW + 4, 6);
-                }
-            } else {
-                ctx.fillRect(drawX - 2, drawY + 12, 4, drawH - 14);
-            }
+            if (wind.dir === 'left' && player.isGrounded) { ctx.fillRect(drawX - 6, drawY + 12, 6, drawH - 14); } 
+            else if (wind.dir === 'right' && player.isGrounded) { ctx.fillRect(drawX + drawW, drawY + 12, 6, drawH - 14); } 
+            else if (!player.isGrounded) {
+                if (player.vx > 0) ctx.fillRect(drawX - 6, drawY + 8, 8, drawH - 12);
+                else if (player.vx < 0) ctx.fillRect(drawX + drawW - 2, drawY + 8, 8, drawH - 12);
+                else ctx.fillRect(drawX - 2, drawY + 10, drawW + 4, 6);
+            } else { ctx.fillRect(drawX - 2, drawY + 12, 4, drawH - 14); }
 
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(drawX + 3, drawY + drawH - 4, 5, 4);
-            ctx.fillRect(drawX + drawW - 8, drawY + drawH - 4, 5, 4);
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(drawX + 3, drawY + drawH - 4, 5, 4); ctx.fillRect(drawX + drawW - 8, drawY + drawH - 4, 5, 4);
 
             if (player.isCharging) {
                 const chargeRatio = player.chargeAmount / player.maxCharge;
-                const barWidth = 32;
-                const barHeight = 6;
-                const barX = player.x + (player.w - barWidth) / 2;
-                const barY = player.y - 12;
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-                ctx.fillRect(barX, barY, barWidth, barHeight);
-
+                const barWidth = 32, barHeight = 6, barX = player.x + (player.w - barWidth) / 2, barY = player.y - 12;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(barX, barY, barWidth, barHeight);
                 let chargeColor = '#10b981'; 
-                if (chargeRatio > 0.4 && chargeRatio <= 0.8) {
-                    chargeColor = '#f59e0b'; 
-                } else if (chargeRatio > 0.8) {
-                    chargeColor = '#ef4444'; 
-                }
-                ctx.fillStyle = chargeColor;
-                ctx.fillRect(barX + 1, barY + 1, (barWidth - 2) * chargeRatio, barHeight - 2);
+                if (chargeRatio > 0.4 && chargeRatio <= 0.8) chargeColor = '#f59e0b'; 
+                else if (chargeRatio > 0.8) chargeColor = '#ef4444'; 
+                ctx.fillStyle = chargeColor; ctx.fillRect(barX + 1, barY + 1, (barWidth - 2) * chargeRatio, barHeight - 2);
             }
-
             ctx.restore();
         }
 
-        async function gameFinished() {
+        // --- 🏆 排行榜儲存與載入核心邏輯 ---
+        function loadAndRenderLeaderboard(highlightRecord = null) {
+            let leaderboard = JSON.parse(localStorage.getItem('jumpKnight_leaderboard')) || [];
+            
+            leaderboard.sort((a, b) => {
+                if (a.jumps !== b.jumps) return a.jumps - b.jumps;
+                return a.time - b.time;
+            });
+            
+            leaderboard = leaderboard.slice(0, 5);
+            localStorage.setItem('jumpKnight_leaderboard', JSON.stringify(leaderboard));
+
+            const listEl = document.getElementById('leaderboard-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            
+            if (leaderboard.length === 0) {
+                listEl.innerHTML = '<li class="text-center text-slate-500 py-2">尚無通關紀錄</li>';
+                return;
+            }
+            
+            leaderboard.forEach((record, index) => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center py-1.5 text-[11px] font-mono";
+                
+                const isCurrent = highlightRecord && 
+                                  record.name === highlightRecord.name &&
+                                  record.jumps === highlightRecord.jumps && 
+                                  record.falls === highlightRecord.falls && 
+                                  record.time === highlightRecord.time;
+                
+                if (isCurrent) {
+                    li.className += " bg-indigo-500/20 px-1 rounded border border-indigo-500/30 text-indigo-300";
+                }
+
+                let rankBadge = `<span class="inline-block w-4 text-center font-bold text-slate-400">${index + 1}.</span>`;
+                if (index === 0) rankBadge = `<span class="inline-block w-4 text-center text-amber-400 font-bold"><i class="fa-solid fa-medal"></i></span>`;
+                if (index === 1) rankBadge = `<span class="inline-block w-4 text-center text-slate-300 font-bold"><i class="fa-solid fa-medal"></i></span>`;
+                if (index === 2) rankBadge = `<span class="inline-block w-4 text-center text-amber-700 font-bold"><i class="fa-solid fa-medal"></i></span>`;
+
+                li.innerHTML = `
+                    <div class="flex items-center gap-1 max-w-[55%] truncate">
+                        ${rankBadge}
+                        <span class="text-slate-200 font-bold truncate mr-1">${record.name || '無名騎士'}</span>
+                        <span class="text-emerald-400 font-semibold text-[10px] shrink-0">(跳躍:${record.jumps})</span>
+                    </div>
+                    <div class="text-right text-slate-400 text-[10px] shrink-0">
+                        <span>墜落:${record.falls}</span> | 
+                        <span class="text-cyan-400 font-semibold">${record.time}秒</span>
+                    </div>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        // 送出名字按鈕監聽
+        document.getElementById('submit-score-btn').addEventListener('click', () => {
+            const nameInput = document.getElementById('player-name');
+            let nickname = nameInput.value.trim();
+            if (!nickname) nickname = "無名騎士";
+
+            const newRecord = {
+                name: nickname,
+                jumps: totalJumps,
+                falls: totalFalls,
+                time: currentFinalTime,
+                date: new Date().toLocaleDateString()
+            };
+
+            let leaderboard = JSON.parse(localStorage.getItem('jumpKnight_leaderboard')) || [];
+            leaderboard.push(newRecord);
+            localStorage.setItem('jumpKnight_leaderboard', JSON.stringify(leaderboard));
+
+            loadAndRenderLeaderboard(newRecord);
+
+            document.getElementById('name-input-section').classList.add('hidden');
+            showToast("👑 傳奇紀錄已成功登錄！");
+        });
+
+        // 清除排行榜
+        document.getElementById('clear-leaderboard').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('確定要清除所有榮譽排行榜紀錄嗎？此動作無法復原。')) {
+                localStorage.removeItem('jumpKnight_leaderboard');
+                loadAndRenderLeaderboard();
+                showToast("🗑️ 排行榜已清空！");
+            }
+        });
+
+        function gameFinished() {
             isGameFinished = true;
-            const finalTimeSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+            currentFinalTime = Math.floor((Date.now() - gameStartTime) / 1000);
             
             document.getElementById('final-jumps').innerText = totalJumps;
             document.getElementById('final-falls').innerText = totalFalls;
-            document.getElementById('final-time').innerText = `${finalTimeSeconds} 秒`;
+            document.getElementById('final-time').innerText = `${currentFinalTime} 秒`;
+            
+            document.getElementById('name-input-section').classList.remove('hidden');
+            document.getElementById('player-name').value = '';
+            
+            loadAndRenderLeaderboard();
             
             document.getElementById('victory-screen').classList.remove('hidden');
             playSound('victory');
-
-            // 載入當前排行榜
-            if (window.loadLeaderboard) {
-                await window.loadLeaderboard();
-            }
-
-            // 延遲跳出名字輸入視窗，讓玩家看得到結算畫面
-            setTimeout(async () => {
-                if (window.submitToLeaderboard) {
-                    await window.submitToLeaderboard(finalTimeSeconds);
-                }
-            }, 600);
         }
 
+        // === 修改此處：按下再玩一次按鈕時直接重新整理網頁 ===
         document.getElementById('restart-btn').addEventListener('click', () => {
-            player.x = 220;
-            player.y = 550; 
-            player.vx = 0;
-            player.vy = 0;
-            player.isGrounded = true;
-            player.onIce = false;
-            player.isCharging = false;
-            player.chargeAmount = 0;
-            
-            totalJumps = 0;
-            totalFalls = 0;
-            currentScreenIndex = 0;
-            gameStartTime = Date.now();
-            isGameFinished = false;
-
-            document.getElementById('ui-jumps').innerText = '0';
-            document.getElementById('ui-falls').innerText = '0';
-            updateUIFloor();
-            document.getElementById('victory-screen').classList.add('hidden');
+            window.location.reload(); 
         });
 
-        // --- 主遊戲循環 ---
+        // 首次初始化載入
+        loadAndRenderLeaderboard();
+
         function loop() {
             updatePhysics();
             draw();
             requestAnimationFrame(loop);
         }
-
         loop();
     </script>
 </body>
