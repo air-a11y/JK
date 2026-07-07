@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jump Knight: 攀爬考驗 (仿 Jump King)</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></link>
     <style>
         body {
             background-color: #0f172a;
@@ -22,7 +20,6 @@
 </head>
 <body class="flex flex-col items-center justify-between min-h-screen text-slate-100 p-2 md:p-6 font-sans overflow-x-hidden">
 
-    <!-- 頂部標題與狀態 -->
     <header class="text-center w-full max-w-lg mb-2">
         <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600 tracking-wider">
             JUMP KNIGHT
@@ -30,10 +27,8 @@
         <p class="text-xs md:text-sm text-slate-400 mt-1">「每一次的墜落，都是下一次躍升的養分...或是痛苦的開始。」</p>
     </header>
 
-    <!-- 遊戲主區域 -->
     <div class="relative flex flex-col items-center justify-center w-full max-w-lg">
         
-        <!-- 計分板與資訊 -->
         <div class="flex justify-between w-full px-4 py-2 bg-slate-800/80 backdrop-blur rounded-t-xl border-t border-x border-slate-700 text-xs md:text-sm">
             <div class="flex items-center gap-2">
                 <span class="text-amber-400"><i class="fa-solid fa-layer-group"></i> 樓層:</span>
@@ -51,57 +46,63 @@
             </div>
         </div>
 
-        <!-- 👑 輔助沙盒工具列 (已移除跳關按鈕) -->
         <div class="flex gap-2 justify-between w-full px-3 py-2 bg-slate-900 border-x border-b border-slate-700 text-xs">
             <button id="btn-save" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
                 <i class="fa-solid fa-bookmark"></i> 存檔 (K)
             </button>
-            <button id="btn-load" class="flex-1 py-1.5 bg-slate-700 text-slate-400 rounded text-center font-bold transition-all cursor-not-allowed flex items-center justify-center gap-1" disabled>
+            <button id="btn-load" class="flex-1 py-1.5 bg-slate-700 text-slate-400 rounded text-center font-bold transition-all flex items-center justify-center gap-1">
                 <i class="fa-solid fa-clock-rotate-left"></i> 讀檔 (L)
+            </button>
+            <button id="btn-skip" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
+                <i class="fa-solid fa-angles-up"></i> 跳關 (N)
             </button>
         </div>
 
-        <!-- 遊戲畫布容器 -->
         <div class="relative w-full aspect-[3/4] bg-slate-950 overflow-hidden border-x border-b border-slate-700 rounded-b-xl shadow-2xl">
             <canvas id="gameCanvas" width="480" height="640" class="w-full h-full block"></canvas>
             
-            <!-- HUD 提示文字彈窗 (Toast Overlay) -->
             <div id="toast" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/95 border border-cyan-500/50 px-4 py-2 rounded-full text-xs font-bold text-cyan-400 shadow-2xl transition-all duration-300 pointer-events-none z-50 opacity-0">
                 位置已儲存！
             </div>
 
-            <!-- 遊戲結束/獲勝畫面Overlay -->
-            <div id="victory-screen" class="hidden absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center text-center p-6 transition-all duration-500">
-                <div class="animate-bounce text-6xl text-amber-400 mb-4">
+            <div id="victory-screen" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center text-center p-4 transition-all duration-500 overflow-y-auto">
+                <div class="text-4xl text-amber-400 mb-1 animate-bounce">
                     <i class="fa-solid fa-crown"></i>
                 </div>
-                <h2 class="text-3xl font-extrabold text-amber-400 mb-2">恭喜登頂！</h2>
-                <p class="text-slate-300 text-sm max-w-xs mb-6">你成功克服了重重難關，證明了自己是真正的躍動之王！</p>
+                <h2 class="text-2xl font-extrabold text-amber-400 mb-1">恭喜登頂！</h2>
+                <p class="text-slate-300 text-xs max-w-xs mb-3">你成功克服了重重難關，證明了自己是真正的躍動之王！</p>
                 
-                <div class="bg-slate-900 p-4 rounded-lg border border-amber-500/30 w-full max-w-xs mb-6 text-left space-y-2">
-                    <div class="flex justify-between text-sm">
+                <div class="bg-slate-900 p-3 rounded-lg border border-amber-500/30 w-full max-w-xs mb-3 text-left space-y-1 text-xs">
+                    <div class="flex justify-between">
                         <span class="text-slate-400">總跳躍次數:</span>
                         <span id="final-jumps" class="font-bold text-emerald-400">0</span>
                     </div>
-                    <div class="flex justify-between text-sm">
+                    <div class="flex justify-between">
                         <span class="text-slate-400">總墜落次數:</span>
                         <span id="final-falls" class="font-bold text-rose-400">0</span>
                     </div>
-                    <div class="flex justify-between text-sm">
+                    <div class="flex justify-between">
                         <span class="text-slate-400">花費時間:</span>
                         <span id="final-time" class="font-bold text-cyan-400">0秒</span>
                     </div>
                 </div>
 
-                <button id="restart-btn" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all transform active:scale-95 shadow-lg shadow-amber-500/20">
+                <div class="w-full max-w-xs bg-slate-900/80 border border-slate-700 rounded-lg p-3 mb-4 text-xs">
+                    <h3 class="text-amber-400 font-bold mb-2 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-trophy"></i> 頂峰傳奇排行榜 (前5名)
+                    </h3>
+                    <div id="leaderboard-list" class="space-y-1 text-left max-h-32 overflow-y-auto text-[11px]">
+                        <p class="text-slate-500 text-center py-2">排行榜載入中...</p>
+                    </div>
+                </div>
+
+                <button id="restart-btn" class="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all transform active:scale-95 shadow-lg text-xs">
                     再次挑戰
                 </button>
             </div>
         </div>
 
-        <!-- 手機版虛擬按鍵 -->
         <div class="w-full mt-4 grid grid-cols-3 gap-3 md:hidden">
-            <!-- 左/右控制 -->
             <div class="grid grid-cols-2 gap-2">
                 <button id="btn-left" class="h-16 bg-slate-800 active:bg-slate-700 text-white text-2xl rounded-xl border border-slate-700 flex items-center justify-center transition-colors">
                     <i class="fa-solid fa-arrow-left"></i>
@@ -110,12 +111,10 @@
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
-            <!-- 緊急煞車按鍵 -->
             <button id="btn-down" class="h-16 bg-rose-950/80 active:bg-rose-900 text-white text-xs font-bold rounded-xl border border-rose-800/50 flex flex-col items-center justify-center transition-all shadow-lg active:scale-95">
                 <span class="text-[9px] text-rose-400 uppercase tracking-wider font-semibold">Brake</span>
                 <span class="text-sm text-white font-extrabold">下 / 煞車</span>
             </button>
-            <!-- 蓄力跳躍控制 -->
             <button id="btn-jump" class="h-16 bg-gradient-to-r from-emerald-600 to-teal-600 active:from-emerald-500 active:to-teal-500 text-slate-950 font-bold rounded-xl flex flex-col items-center justify-center transition-all">
                 <span class="text-xs text-white uppercase tracking-wider font-semibold">CHARGE</span>
                 <span class="text-sm text-white font-extrabold">按住跳躍</span>
@@ -123,16 +122,180 @@
         </div>
     </div>
 
-    <!-- 玩法說明 -->
     <footer class="mt-4 text-center max-w-lg text-xs text-slate-500 space-y-1">
         <p class="hidden md:block"><span class="text-slate-300 font-semibold">電腦操作：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">A</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">D</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">←</kbd> / <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">→</kbd> 移動。</p>
         <p class="hidden md:block">按住 <kbd class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700">空白鍵 (Space)</kbd> 進行蓄力，釋放時會依方向跳出。</p>
         <p class="hidden md:block"><span class="text-rose-400 font-semibold">急停煞車：</span> 按住 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">S</kbd> 或 <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">↓ 下方向鍵</kbd> 可以在滑行時緊急減速！</p>
-        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔助熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 隨地存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 快速讀檔。</p>
+        <p class="hidden md:block"><span class="text-cyan-400 font-semibold">輔育熱鍵：</span> <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">K</kbd> 雲端存檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">L</kbd> 雲端讀檔 | <kbd class="px-1 py-0.5 bg-slate-800 rounded border border-slate-700">N</kbd> 快速跳關。</p>
         <p class="md:hidden"><span class="text-slate-300 font-semibold">手機操作：</span> 使用方向鍵移動、<span class="text-rose-400 font-semibold">下/煞車</span> 進行急停、<span class="text-emerald-400 font-semibold">CHARGE</span> 進行蓄力跳躍。</p>
     </footer>
 
-    <!-- 遊戲核心 JavaScript -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 使用您提供的真實 Firebase 帳號配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4CxgU3klzot_P4h1JiSiM_BM7s-OaHoQ",
+            authDomain: "jumiknight-bfcc8.firebaseapp.com",
+            projectId: "jumiknight-bfcc8",
+            storageBucket: "jumiknight-bfcc8.firebasestorage.app",
+            messagingSenderId: "637669289832",
+            appId: "1:637669289832:web:bd97f54786adb6cc5430dd",
+            measurementId: "G-H8H3741FTZ"
+        };
+
+        // 初始化 Firebase 和 Firestore 資料庫
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 將功能註冊到全域，供原本遊戲的核心邏輯呼叫
+        window.quickSave = async function() {
+            if (isGameFinished) return;
+            showToast("💾 雲端儲存中...");
+            try {
+                const stateToSave = {
+                    x: player.x,
+                    y: player.y,
+                    vx: player.vx,
+                    vy: player.vy,
+                    facing: player.facing,
+                    onIce: player.onIce,
+                    isGrounded: player.isGrounded,
+                    currentScreenIndex: currentScreenIndex,
+                    totalJumps: totalJumps,
+                    totalFalls: totalFalls,
+                    savedAt: new Date().toISOString()
+                };
+                
+                // 將進度儲存到雲端數據庫 saves/player1
+                await setDoc(doc(db, "saves", "player1"), stateToSave);
+                
+                // 調整 UI 讀檔按鈕狀態
+                const btnLoad = document.getElementById('btn-load');
+                btnLoad.className = "flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1";
+                
+                playSound('save');
+                showToast("💾 進度已同步至 Firebase 雲端！");
+            } catch (error) {
+                console.error("儲存失敗:", error);
+                showToast("❌ 雲端儲存失敗");
+            }
+        };
+
+        window.quickLoad = async function() {
+            if (isGameFinished) return;
+            showToast("⏳ 讀取雲端存檔中...");
+            try {
+                const docSnap = await getDoc(doc(db, "saves", "player1"));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    player.x = data.x;
+                    player.y = data.y;
+                    player.vx = data.vx;
+                    player.vy = data.vy;
+                    player.facing = data.facing;
+                    player.onIce = data.onIce;
+                    player.isGrounded = data.isGrounded;
+                    player.isCharging = false;
+                    player.chargeAmount = 0;
+                    currentScreenIndex = data.currentScreenIndex;
+                    totalJumps = data.totalJumps || 0;
+                    totalFalls = data.totalFalls || 0;
+                    
+                    // 同步更動數據計分板
+                    document.getElementById('ui-jumps').innerText = totalJumps;
+                    document.getElementById('ui-falls').innerText = totalFalls;
+                    updateUIFloor();
+                    playSound('load');
+                    showToast("⏳ 已成功恢復雲端歷史進度！");
+                } else {
+                    showToast("❓ 雲端無任何存檔紀錄");
+                }
+            } catch (error) {
+                console.error("讀取失敗:", error);
+                showToast("❌ 讀取存檔失敗");
+            }
+        };
+
+        // 刷新排行榜畫面邏輯
+        window.loadLeaderboard = async function() {
+            const listContainer = document.getElementById('leaderboard-list');
+            listContainer.innerHTML = '<p class="text-slate-500 text-center py-2">排行榜載入中...</p>';
+            try {
+                // 從 scores 集合抓取花費時間最少的前 5 筆紀錄
+                const q = query(collection(db, "scores"), orderBy("timeSpent"), limit(5));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    listContainer.innerHTML = '<p class="text-slate-500 text-center py-2">暫無通關數據，快來搶佔沙發！</p>';
+                    return;
+                }
+
+                let html = '<table class="w-full border-collapse"><thead><tr class="text-slate-400 border-b border-slate-700 text-left"><th class="py-1">名次</th><th>玩家</th><th>時間</th><th>跳躍/墜落</th></tr></thead><tbody>';
+                let rank = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const name = data.playerName || '無名騎士';
+                    const time = data.timeSpent || 0;
+                    const jumps = data.jumps || 0;
+                    const falls = data.falls || 0;
+                    
+                    let medal = `${rank}`;
+                    if(rank === 1) medal = '🥇';
+                    if(rank === 2) medal = '🥈';
+                    if(rank === 3) medal = '🥉';
+
+                    html += `<tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                        <td class="py-1 font-bold">${medal}</td>
+                        <td class="text-amber-200 truncate max-w-[80px] font-semibold">${name}</td>
+                        <td class="text-cyan-400 font-mono">${time}秒</td>
+                        <td class="text-slate-400 font-mono">${jumps}/${falls}</td>
+                    </tr>`;
+                    rank++;
+                });
+                html += '</tbody></table>';
+                listContainer.innerHTML = html;
+            } catch (error) {
+                console.error("載入排行榜出錯:", error);
+                listContainer.innerHTML = '<p class="text-rose-400 text-center py-2">❌ 無法載入排行榜</p>';
+            }
+        };
+
+        // 提交紀錄至排行榜
+        window.submitToLeaderboard = async function(finalTimeSeconds) {
+            const playerName = prompt("🏆 登頂成功！請輸入您的騎士大名留念：", "無名騎士");
+            if (!playerName) return;
+
+            try {
+                showToast("🚀 排行榜數據上傳中...");
+                await addDoc(collection(db, "scores"), {
+                    playerName: playerName.trim(),
+                    timeSpent: finalTimeSeconds,
+                    jumps: totalJumps,
+                    falls: totalFalls,
+                    createdAt: new Date().toISOString()
+                });
+                showToast("✨ 排行榜數據更新完畢！");
+                // 重新載入排行榜
+                window.loadLeaderboard();
+            } catch (error) {
+                console.error("提交分數出錯:", error);
+                showToast("❌ 數據上傳失敗");
+            }
+        };
+
+        // 先行嘗試檢查一次雲端是否有存檔，有的話就把讀檔按鈕調亮
+        try {
+            getDoc(doc(db, "saves", "player1")).then((snap) => {
+                if (snap.exists()) {
+                    document.getElementById('btn-load').className = "flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1";
+                }
+            });
+        } catch(e){}
+    </script>
+
     <script>
         // --- 音效合成器 (Web Audio API) ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -216,19 +379,18 @@
 
         // --- 物理常數配置 ---
         const PHYSICS = {
-            gravityUp: 0.35,           // 向上起跳時的重力
-            gravityDown: 0.22,         // 向下墜落時的重力
-            speed: 3,                  // 左右走路移動速度
-            iceFriction: 0.91,         // 冰面滑動摩擦阻力
-            iceAcceleration: 0.20,     // 冰面行走加速度
-            windForceAir: -0.12,       // 基礎風阻推力（基準值，動態計算）
+            gravityUp: 0.35,           
+            gravityDown: 0.22,         
+            speed: 3,                  
+            iceFriction: 0.91,         
+            iceAcceleration: 0.20,     
+            windForceAir: -0.12,       
             
-            // 跳躍高度與蓄力調整
-            minJumpY: 5.2,             // 基礎最小垂直跳躍力
-            maxJumpY: 12.2,            // 最大垂直跳躍力
-            minJumpX: 2.2,             // 基礎最小水平跳躍力
-            maxJumpX: 7.6,             // 最大水平跳躍力
-            chargeSpeed: 3.8,          // 蓄力速度
+            minJumpY: 5.2,             
+            maxJumpY: 12.2,            
+            minJumpX: 2.2,             
+            maxJumpX: 7.6,             
+            chargeSpeed: 3.8,          
         };
 
         // --- 遊戲引擎設定 ---
@@ -240,7 +402,6 @@
         let totalFalls = 0;
         let gameStartTime = Date.now();
         let isGameFinished = false;
-        let savedState = null;
 
         // 玩家物件
         const player = {
@@ -256,13 +417,11 @@
             onIce: false,              
             facing: 'right',           
             
-            // 蓄力機制
             isCharging: false,
             chargeAmount: 0,           
             maxCharge: 100,
             chargeSpeed: PHYSICS.chargeSpeed,
             
-            // 物理反彈狀態
             isBouncing: false,         
             bounceTimer: 0,
         };
@@ -281,9 +440,8 @@
         let mobileDown = false;
         let mobileCharging = false;
 
-        // 關卡配置 - 全新 10 關垂直神塔配置 (每層 30px 高，且出入口精準完美對接，絕不撞頭)
+        // 關卡配置 - 全新 10 關垂直神塔配置
         const screens = [
-            // 關卡 1：經典地基 (出：中偏右)
             [
                 { x: 0, y: 590, w: 480, h: 50, color: '#334155' }, 
                 { x: 40, y: 470, w: 130, h: 30, color: '#475569' },
@@ -293,7 +451,6 @@
                 { x: 350, y: 230, w: 110, h: 30, color: '#475569' },
                 { x: 130, y: 120, w: 220, h: 30, color: '#475569' }, 
             ],
-            // 關卡 2：交錯石壁 (進：中，出：左)
             [
                 { x: 120, y: 610, w: 240, h: 30, color: '#4d4d4d' }, 
                 { x: 40, y: 490, w: 130, h: 30, color: '#4d4d4d' },
@@ -303,7 +460,6 @@
                 { x: 330, y: 250, w: 120, h: 30, color: '#4d4d4d' },
                 { x: 0, y: 130, w: 180, h: 30, color: '#4d4d4d' } 
             ],
-            // 關卡 3：冰雪初顯 (進：左，出：中)
             [
                 { x: 0, y: 610, w: 180, h: 30, color: '#4d4d4d' },   
                 { x: 320, y: 610, w: 160, h: 30, color: '#4d4d4d' }, 
@@ -313,7 +469,6 @@
                 { x: 420, y: 180, w: 60, h: 110, color: '#38bdf8', isIce: true }, 
                 { x: 140, y: 120, w: 200, h: 30, color: '#4d4d4d' }, 
             ],
-            // 關卡 4：寒冰裂隙 (進：中，出：左側偏中)
             [
                 { x: 140, y: 610, w: 200, h: 30, color: '#4d4d4d' },
                 { x: 20, y: 490, w: 120, h: 30, color: '#38bdf8', isIce: true },
@@ -323,38 +478,32 @@
                 { x: 330, y: 250, w: 110, h: 30, color: '#38bdf8', isIce: true },
                 { x: 100, y: 120, w: 150, h: 30, color: '#4d4d4d' } 
             ],
-            // 關卡 5：地底撞擊區 (進：左側偏中，出：雙側)
             [
                 { x: 90, y: 610, w: 160, h: 30, color: '#4b5563' },  
                 { x: 0, y: 490, w: 140, h: 30, color: '#4b5563' },   
                 { x: 240, y: 490, w: 240, h: 30, color: '#4b5563' },  
-                
                 { x: 180, y: 380, w: 120, h: 30, color: '#6b7280' },  
                 { x: 30, y: 270, w: 110, h: 30, color: '#6b7280' },   
                 { x: 340, y: 270, w: 110, h: 30, color: '#6b7280' },  
-                
                 { x: 150, y: 150, w: 180, h: 30, color: '#4b5563' },  
                 { x: 0, y: 70, w: 120, h: 30, color: '#4b5563' },    
                 { x: 360, y: 70, w: 120, h: 30, color: '#4b5563' },   
             ],
-            // 關卡 6：強風初鳴 [🌬️ 開始起風] (進：雙側，出：中)
             [
                 { x: 0, y: 610, w: 140, h: 30, color: '#2dd4bf' },   
                 { x: 340, y: 610, w: 140, h: 30, color: '#2dd4bf' }, 
                 { x: 180, y: 490, w: 120, h: 30, color: '#2dd4bf' }, 
                 { x: 50, y: 380, w: 110, h: 30, color: '#2dd4bf' },  
                 { x: 320, y: 270, w: 110, h: 30, color: '#2dd4bf' }, 
-                { x: 130, y: 150, w: 220, h: 30, color: '#2dd4bf' }, 
+                { x: 100, y: 150, w: 180, h: 30, color: '#2dd4bf' }, 
             ],
-            // 關卡 7：風暴崖跳 [🌬️ 順風右吹！] (進：中，出：右)
             [
-                { x: 120, y: 610, w: 240, h: 30, color: '#2dd4bf' },
+                { x: 100, y: 610, w: 260, h: 30, color: '#2dd4bf' },
                 { x: 50, y: 480, w: 100, h: 30, color: '#2dd4bf' },
                 { x: 330, y: 360, w: 100, h: 30, color: '#2dd4bf' },
                 { x: 150, y: 240, w: 180, h: 30, color: '#2dd4bf' },
                 { x: 300, y: 130, w: 180, h: 30, color: '#2dd4bf' }
             ],
-            // 關卡 8：冰與風之歌 [🌬️ 雙向5秒輪替風+❄️] (進：右，出：左)
             [
                 { x: 280, y: 610, w: 200, h: 30, color: '#2dd4bf' },
                 { x: 100, y: 480, w: 150, h: 30, color: '#38bdf8', isIce: true },
@@ -362,7 +511,6 @@
                 { x: 80, y: 250, w: 140, h: 30, color: '#38bdf8', isIce: true },
                 { x: 0, y: 130, w: 180, h: 30, color: '#2dd4bf' }
             ],
-            // 關卡 9：登天不對稱神木 [🌬️ 雙向5秒輪替風] (進：左，出：中)
             [
                 { x: 0, y: 610, w: 200, h: 30, color: '#1e293b' },
                 { x: 280, y: 490, w: 120, h: 30, color: '#1e293b' },
@@ -370,7 +518,6 @@
                 { x: 290, y: 280, w: 110, h: 30, color: '#38bdf8', isIce: true },
                 { x: 130, y: 140, w: 220, h: 30, color: '#1e293b' }
             ],
-            // 關卡 10：傳奇頂峰 [⬆️ 上升氣流！] (進：中，終點！)
             [
                 { x: 120, y: 610, w: 240, h: 30, color: '#1e293b' },
                 { x: 40, y: 450, w: 100, h: 30, color: '#b45309' },
@@ -381,7 +528,7 @@
 
         let currentScreenIndex = 0;
 
-        // 寶藏 (配合第10關終點平台，精確放置在中央 x: 220)
+        // 寶藏 
         const treasure = {
             x: 220,
             y: 280,
@@ -392,16 +539,7 @@
 
         // --- 核心風力動態計算函數 ---
         function getWindForce() {
-            // 第 6 關 (index 5): 向左吹
-            if (currentScreenIndex === 5) {
-                return { x: PHYSICS.windForceAir, y: 0, dir: 'left' };
-            }
-            // 第 7 關 (index 6): 反方向向右吹 ➡️
-            if (currentScreenIndex === 6) {
-                return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
-            }
-            // 第 8、9 關 (index 7, 8): 每 5 秒輪替左右雙向風 🔄
-            if (currentScreenIndex === 7 || currentScreenIndex === 8) {
+            if (currentScreenIndex === 5 || currentScreenIndex === 8) {
                 let cycle = Math.floor(Date.now() / 5000) % 2;
                 if (cycle === 0) {
                     return { x: PHYSICS.windForceAir, y: 0, dir: 'left' };
@@ -409,9 +547,11 @@
                     return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
                 }
             }
-            // 第 10 關 (index 9): 上升氣流 ⬆️
+            if (currentScreenIndex === 6) {
+                return { x: -PHYSICS.windForceAir, y: 0, dir: 'right' };
+            }
             if (currentScreenIndex === 9) {
-                return { x: 0, y: -0.16, dir: 'up' }; // 溫和而穩定的向上升力
+                return { x: 0, y: -0.16, dir: 'up' }; 
             }
             return { x: 0, y: 0, dir: 'none' };
         }
@@ -470,51 +610,44 @@
             }, 1500);
         }
 
-        // --- 沙盒與作弊功能實作 ---
-        function quickSave() {
-            if (isGameFinished) return;
-            savedState = {
-                x: player.x,
-                y: player.y,
-                vx: player.vx,
-                vy: player.vy,
-                facing: player.facing,
-                onIce: player.onIce,
-                isGrounded: player.isGrounded,
-                currentScreenIndex: currentScreenIndex
-            };
-            
-            const btnLoad = document.getElementById('btn-load');
-            btnLoad.removeAttribute('disabled');
-            btnLoad.className = "flex-1 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-center text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-1";
-            
-            playSound('save');
-            showToast("💾 當前位置已儲存！");
+        // --- 沙盒與作弊功能實作 (對接 Firebase 外觀) ---
+        function triggerSave() {
+            if (window.quickSave) {
+                window.quickSave();
+            }
         }
 
-        function quickLoad() {
-            if (isGameFinished || !savedState) return;
+        function triggerLoad() {
+            if (window.quickLoad) {
+                window.quickLoad();
+            }
+        }
+
+        function skipLevel() {
+            if (isGameFinished) return;
             
-            player.x = savedState.x;
-            player.y = savedState.y;
-            player.vx = savedState.vx;
-            player.vy = savedState.vy;
-            player.facing = savedState.facing;
-            player.onIce = savedState.onIce;
-            player.isGrounded = savedState.isGrounded;
+            currentScreenIndex = (currentScreenIndex + 1) % screens.length;
+            
+            const targetPlat = screens[currentScreenIndex][0];
+            player.x = targetPlat.x + (targetPlat.w / 2) - (player.w / 2);
+            player.y = targetPlat.y - player.h - 5;
+            player.vx = 0;
+            player.vy = 0;
+            player.isGrounded = true;
+            player.onIce = targetPlat.isIce || false;
             player.isCharging = false;
             player.chargeAmount = 0;
-            currentScreenIndex = savedState.currentScreenIndex;
-            
+
             updateUIFloor();
-            playSound('load');
-            showToast("⏳ 已載入存檔點位置！");
+            playSound('land');
+            showToast(`🚀 已跳越至第 ${currentScreenIndex + 1} 樓！`);
         }
 
-        document.getElementById('btn-save').addEventListener('click', quickSave);
-        document.getElementById('btn-load').addEventListener('click', quickLoad);
+        document.getElementById('btn-save').addEventListener('click', triggerSave);
+        document.getElementById('btn-load').addEventListener('click', triggerLoad);
+        document.getElementById('btn-skip').addEventListener('click', skipLevel);
 
-        // --- 鍵盤監聽事件 (已完全清除 N 鍵與 btn-skip 相關邏輯) ---
+        // --- 鍵盤監聽事件 ---
         window.addEventListener('keydown', (e) => {
             if (isGameFinished) return;
             if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
@@ -528,8 +661,9 @@
                 keys.space = true;
             }
             
-            if (e.code === 'KeyK') quickSave();   
-            if (e.code === 'KeyL') quickLoad();   
+            if (e.code === 'KeyK') triggerSave();   
+            if (e.code === 'KeyL') triggerLoad();   
+            if (e.code === 'KeyN') skipLevel();   
         });
 
         window.addEventListener('keyup', (e) => {
@@ -581,7 +715,6 @@
             const isPressingCharge = keys.space || mobileCharging;
             const isBraking = keys.down || mobileDown;
 
-            // 1. 地面移動與「冰面滑溜」物理
             if (player.isGrounded) {
                 if (isBraking) {
                     player.vx *= 0.5; 
@@ -615,7 +748,6 @@
                 }
             }
 
-            // 2. 蓄力跳躍機制
             if (player.isGrounded) {
                 if (isPressingCharge) {
                     player.isCharging = true;
@@ -631,10 +763,8 @@
                 } else if (player.isCharging) {
                     const chargeRatio = player.chargeAmount / player.maxCharge;
                     
-                    // 垂直跳躍力
                     player.vy = -(PHYSICS.minJumpY + chargeRatio * (PHYSICS.maxJumpY - PHYSICS.minJumpY));
                     
-                    // 水平跳躍力
                     let bonusX = player.onIce ? player.vx * 0.8 : 0;
 
                     if (isMovingLeft) {
@@ -656,7 +786,6 @@
                 }
             }
 
-            // 3. 空中重力與硬直時間
             if (!player.isGrounded) {
                 player.gravity = (player.vy < 0) ? PHYSICS.gravityUp : PHYSICS.gravityDown;
                 player.vy += player.gravity;
@@ -669,25 +798,20 @@
                 }
             }
 
-            // 【動態風力套用修正】
             const wind = getWindForce();
             if (wind.x !== 0 || wind.y !== 0) {
                 if (!player.isGrounded) {
-                    // 空中受風影響 (包含 Y 軸上升氣流)
                     player.vx += wind.x;
                     player.vy += wind.y;
                 } else if (!isBraking) {
-                    // 地面沒煞車時，橫向風會推移玩家
                     if (wind.x !== 0) {
                         player.vx += wind.x * 2.91; 
                     }
                 }
             }
 
-            // 4. 運動預測與碰撞 (X 軸)
             player.x += player.vx;
             
-            // 螢幕左右邊界碰撞
             if (player.x < 0) {
                 player.x = 0;
                 if (!player.isGrounded) {
@@ -712,7 +836,6 @@
                 }
             }
 
-            // 平台左右碰撞
             const currentPlatforms = screens[currentScreenIndex];
             for (let plat of currentPlatforms) {
                 if (checkCollision(player, plat)) {
@@ -744,13 +867,11 @@
                 }
             }
 
-            // 5. 運動預測與碰撞 (Y 軸)
             player.y += player.vy;
             let onPlatform = false;
 
             for (let plat of currentPlatforms) {
                 if (checkCollision(player, plat)) {
-                    // 往下掉落地面
                     if (player.vy > 0 && player.y + player.h - player.vy <= plat.y + 6) {
                         player.y = plat.y - player.h;
                         player.vy = 0;
@@ -768,7 +889,6 @@
                         }
                         onPlatform = true;
                     }
-                    // 往上跳撞頭 (Bonk!)
                     else if (player.vy < 0 && player.y - player.vy >= plat.y + plat.h - 6) {
                         player.y = plat.y + plat.h;
                         player.vy = 0; 
@@ -783,7 +903,6 @@
                 player.onIce = false; 
             }
 
-            // 更新 ice 粒子生命週期
             for (let i = iceParticles.length - 1; i >= 0; i--) {
                 const p = iceParticles[i];
                 p.x += p.vx;
@@ -794,7 +913,6 @@
                 }
             }
 
-            // 6. 垂直切換螢幕機制
             if (player.y < 0) {
                 if (currentScreenIndex < screens.length - 1) {
                     currentScreenIndex++;
@@ -821,7 +939,6 @@
                 }
             }
 
-            // 7. 偵測終點碰撞
             if (currentScreenIndex === screens.length - 1 && !isGameFinished) {
                 const treasureRect = { x: treasure.x, y: treasure.y, w: treasure.w, h: treasure.h };
                 if (checkCollision(player, treasureRect)) {
@@ -853,7 +970,6 @@
             ctx.fillStyle = bgGradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 繪製背景風雪/強風粒子
             const wind = getWindForce();
             createParticles();
             particles.forEach((p, idx) => {
@@ -1025,11 +1141,9 @@
                 drawX = player.x - 1;
             }
 
-            // 1. 騎士身體
             ctx.fillStyle = '#475569';
             ctx.fillRect(drawX, drawY, drawW, drawH);
 
-            // 2. 騎士頭盔與面罩
             ctx.fillStyle = '#334155';
             ctx.fillRect(drawX + 2, drawY + 2, drawW - 4, 12);
             
@@ -1044,9 +1158,8 @@
                 ctx.fillRect(drawX + 3, drawY + 6, 3, 3);
             }
 
-            // 3. 紅色帥氣斗篷 
             ctx.fillStyle = '#dc2626';
-            const wind = getWindForce(); // 修正：在這裡定義 wind 變數，解決 ReferenceError 錯誤
+            const wind = getWindForce();
             if (wind.dir === 'left' && player.isGrounded) {
                 ctx.fillRect(drawX - 6, drawY + 12, 6, drawH - 14); 
             } else if (wind.dir === 'right' && player.isGrounded) {
@@ -1063,12 +1176,10 @@
                 ctx.fillRect(drawX - 2, drawY + 12, 4, drawH - 14);
             }
 
-            // 4. 手部與腳步
             ctx.fillStyle = '#1e293b';
             ctx.fillRect(drawX + 3, drawY + drawH - 4, 5, 4);
             ctx.fillRect(drawX + drawW - 8, drawY + drawH - 4, 5, 4);
 
-            // 5. 蓄力指示條
             if (player.isCharging) {
                 const chargeRatio = player.chargeAmount / player.maxCharge;
                 const barWidth = 32;
@@ -1092,7 +1203,7 @@
             ctx.restore();
         }
 
-        function gameFinished() {
+        async function gameFinished() {
             isGameFinished = true;
             const finalTimeSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
             
@@ -1102,6 +1213,18 @@
             
             document.getElementById('victory-screen').classList.remove('hidden');
             playSound('victory');
+
+            // 載入當前排行榜
+            if (window.loadLeaderboard) {
+                await window.loadLeaderboard();
+            }
+
+            // 延遲跳出名字輸入視窗，讓玩家看得到結算畫面
+            setTimeout(async () => {
+                if (window.submitToLeaderboard) {
+                    await window.submitToLeaderboard(finalTimeSeconds);
+                }
+            }, 600);
         }
 
         document.getElementById('restart-btn').addEventListener('click', () => {
