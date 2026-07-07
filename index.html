@@ -344,14 +344,14 @@
                 { x: 100, y: 480, w: 150, h: 30, color: '#38bdf8', isIce: true },
                 { x: 300, y: 370, w: 120, h: 30, color: '#2dd4bf' },
                 { x: 80, y: 250, w: 140, h: 30, color: '#38bdf8', isIce: true },
-                { x: 0, y: 130, w: 180, h: 30, color: '#2dd4bf' }
+                { x: 0, y: 130, w: 110, h: 30, color: '#2dd4bf' } 
             ],
             [
                 { x: 0, y: 610, w: 200, h: 30, color: '#1e293b' },
                 { x: 280, y: 490, w: 120, h: 30, color: '#1e293b' },
                 { x: 100, y: 390, w: 110, h: 30, color: '#1e293b' },
                 { x: 290, y: 280, w: 110, h: 30, color: '#38bdf8', isIce: true },
-                { x: 130, y: 140, w: 220, h: 30, color: '#1e293b' }
+                { x: 170, y: 140, w: 140, h: 30, color: '#1e293b' } // 此處已將寬度從 220 縮短至 140，降低攀爬與起跳的卡關感
             ],
             [
                 { x: 120, y: 610, w: 240, h: 30, color: '#1e293b' },
@@ -877,7 +877,7 @@
             playSound('victory');
         }
 
-        // === 修改此處：按下再玩一次按鈕時直接重新整理網頁 ===
+        // 按下再玩一次按鈕時直接重新整理網頁
         document.getElementById('restart-btn').addEventListener('click', () => {
             window.location.reload(); 
         });
